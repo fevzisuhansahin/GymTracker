@@ -1,0 +1,23 @@
+{
+  "common": {
+    "appName": "GymTracker",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back"
+  },
+  "nav": {
+    "dashboard": "Home",
+    "history": "History",
+    "splits": "Programs",
+    "settings": "Settings",
+    "newWorkout": "New Workout"
+  },
+  "landing": {
+    "headline": "Track your workouts.",
+    "subheadline": "Coming soon.",
+    "comingSoon": "Coming Soon"
+  }
+}

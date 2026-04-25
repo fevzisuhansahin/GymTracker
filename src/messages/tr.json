@@ -1,0 +1,23 @@
+{
+  "common": {
+    "appName": "GymTracker",
+    "loading": "Yükleniyor...",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "back": "Geri"
+  },
+  "nav": {
+    "dashboard": "Ana Sayfa",
+    "history": "Geçmiş",
+    "splits": "Programlar",
+    "settings": "Ayarlar",
+    "newWorkout": "Yeni Antrenman"
+  },
+  "landing": {
+    "headline": "Antrenmanlarını takip et.",
+    "subheadline": "Yakında geliyor.",
+    "comingSoon": "Çok Yakında"
+  }
+}
