@@ -410,6 +410,18 @@ export type Database = {
     }
     Functions: {
       estimate_1rm: { Args: { reps: number; weight: number }; Returns: number }
+      create_split_with_days: {
+        Args: { p_name: string; p_description: string | null; p_days: Json }
+        Returns: string
+      }
+      copy_template_split: {
+        Args: { p_template_id: string }
+        Returns: string
+      }
+      finish_workout: {
+        Args: { p_workout_id: string; p_notes: string | null; p_duration_seconds: number }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
