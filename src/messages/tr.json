@@ -13,11 +13,135 @@
     "history": "Geçmiş",
     "splits": "Programlar",
     "settings": "Ayarlar",
-    "newWorkout": "Yeni Antrenman"
+    "profile": "Profil",
+    "newWorkout": "Yeni Antrenman",
+    "newWorkoutShort": "Antrenman"
+  },
+  "header": {
+    "logout": "Çıkış Yap",
+    "signedInAs": "Giriş yapıldı"
   },
   "landing": {
     "headline": "Antrenmanlarını takip et.",
     "subheadline": "Yakında geliyor.",
     "comingSoon": "Çok Yakında"
+  },
+  "auth": {
+    "emailLabel": "E-posta",
+    "emailPlaceholder": "ornek@eposta.com",
+    "passwordLabel": "Şifre",
+    "continueWithGoogle": "Google ile devam et",
+    "redirecting": "Yönlendiriliyor...",
+    "orDivider": "veya",
+    "login": {
+      "title": "Giriş Yap",
+      "submit": "Giriş Yap",
+      "submitting": "Giriş yapılıyor...",
+      "forgotPassword": "Şifremi unuttum",
+      "noAccount": "Hesabın yok mu?",
+      "signupLink": "Kayıt ol"
+    },
+    "signup": {
+      "title": "Kayıt Ol",
+      "submit": "Hesap oluştur",
+      "submitting": "Oluşturuluyor...",
+      "passwordHint": "En az 8 karakter ve 1 rakam içermeli.",
+      "confirmPasswordLabel": "Şifre (tekrar)",
+      "haveAccount": "Zaten bir hesabın var mı?",
+      "loginLink": "Giriş yap",
+      "verifyTitle": "E-postanı kontrol et",
+      "verifyBody": "Hesabını doğrulamak için e-posta adresine bir link gönderdik. Linke tıklayarak girişe devam edebilirsin.",
+      "verifyHint": "E-posta gelmediyse spam klasörünü kontrol et.",
+      "verifyBackToLogin": "Giriş sayfasına dön"
+    },
+    "forgotPassword": {
+      "title": "Şifremi Unuttum",
+      "description": "E-posta adresine sıfırlama linki gönderelim.",
+      "submit": "Sıfırlama linki gönder",
+      "submitting": "Gönderiliyor...",
+      "successMessage": "Eğer bu e-posta sistemde kayıtlıysa, sıfırlama linki gönderdik. Spam klasörünü kontrol etmeyi unutma.",
+      "backToLogin": "Giriş sayfasına dön"
+    },
+    "resetPassword": {
+      "title": "Yeni Şifre Belirle",
+      "description": "Hesabın için yeni bir şifre belirle.",
+      "newPasswordLabel": "Yeni şifre",
+      "submit": "Şifreyi güncelle",
+      "submitting": "Güncelleniyor..."
+    },
+    "errors": {
+      "generic": "Bir hata oluştu. Lütfen tekrar dene.",
+      "invalidCredentials": "E-posta veya şifre hatalı.",
+      "emailNotConfirmed": "Önce e-posta adresini doğrulaman gerekiyor.",
+      "emailAlreadyExists": "Bu e-posta ile zaten bir hesap var.",
+      "weakPassword": "Şifre çok zayıf. Daha güçlü bir şifre dene.",
+      "rateLimit": "Çok fazla deneme. Bir süre bekle ve tekrar dene.",
+      "linkExpired": "Bu linkin süresi dolmuş. Yeni bir tane iste.",
+      "notAuthenticated": "Oturumun sona ermiş. Tekrar giriş yap.",
+      "emailRequired": "E-posta gerekli.",
+      "emailInvalid": "Geçerli bir e-posta gir.",
+      "passwordRequired": "Şifre gerekli.",
+      "passwordTooShort": "Şifre en az 8 karakter olmalı.",
+      "passwordNeedsNumber": "Şifre en az 1 rakam içermeli.",
+      "passwordsDoNotMatch": "Şifreler eşleşmiyor."
+    }
+  },
+  "onboarding": {
+    "progress": "{current} / {total}",
+    "next": "İleri",
+    "back": "Geri",
+    "complete": "Tamamla",
+    "step1": {
+      "title": "Bir kullanıcı adı seç",
+      "description": "Profilinde ve leaderboard'da bu adın görünür. Sonradan değiştirebilirsin.",
+      "label": "Kullanıcı adı",
+      "placeholder": "kullaniciadi",
+      "hint": "3-20 karakter. Küçük harf, rakam ve _ kullanabilirsin.",
+      "taken": "Bu kullanıcı adı kullanımda."
+    },
+    "step2": {
+      "title": "Görünen adın ne olsun?",
+      "description": "Bu, profilinde ve leaderboard'da görünecek isim. İstediğin zaman değiştirebilirsin.",
+      "label": "Görünen ad",
+      "placeholder": "Adın"
+    },
+    "step3": {
+      "title": "Birim tercihi",
+      "description": "Kilo değerlerini hangi birimde girmek istersin?",
+      "kgLabel": "kg",
+      "kgSublabel": "Kilogram",
+      "lbLabel": "lb",
+      "lbSublabel": "Pound"
+    },
+    "step4": {
+      "title": "Dil",
+      "description": "Uygulamayı hangi dilde kullanmak istersin?",
+      "tr": "TR",
+      "en": "EN"
+    },
+    "step5": {
+      "title": "Profilin herkese açık olsun mu?",
+      "description": "Bu seçimi sonradan ayarlardan değiştirebilirsin.",
+      "publicTitle": "Herkese açık",
+      "publicDesc": "Açık tutarsan arkadaşların seni leaderboard'da görebilir ve profilini ziyaret edebilir.",
+      "privateTitle": "Gizli",
+      "privateDesc": "Kapatırsan sadece sen görürsün, istediğin zaman değiştirebilirsin.",
+      "changeHint": "Bu seçimi sonradan Ayarlar'dan değiştirebilirsin."
+    },
+    "errors": {
+      "usernameTooShort": "Kullanıcı adı en az 3 karakter olmalı.",
+      "usernameTooLong": "Kullanıcı adı en fazla 20 karakter olabilir.",
+      "usernameInvalid": "Sadece küçük harf, rakam ve _ kullanılabilir.",
+      "usernameTaken": "Bu kullanıcı adı kullanımda.",
+      "displayNameRequired": "Görünen ad gerekli.",
+      "displayNameTooLong": "Görünen ad en fazla 50 karakter olabilir."
+    }
+  },
+  "dashboard": {
+    "greetingPrefix": "Hoşgeldin,",
+    "welcome": "{name} 👋",
+    "startTitle": "Antrenmana başla",
+    "newWorkout": "Yeni Antrenman",
+    "comingSoonNote": "Antrenman akışı yakında hazır olacak."
   }
 }

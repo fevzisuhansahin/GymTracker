@@ -13,11 +13,135 @@
     "history": "History",
     "splits": "Programs",
     "settings": "Settings",
-    "newWorkout": "New Workout"
+    "profile": "Profile",
+    "newWorkout": "New Workout",
+    "newWorkoutShort": "Workout"
+  },
+  "header": {
+    "logout": "Log out",
+    "signedInAs": "Signed in as"
   },
   "landing": {
     "headline": "Track your workouts.",
     "subheadline": "Coming soon.",
     "comingSoon": "Coming Soon"
+  },
+  "auth": {
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "passwordLabel": "Password",
+    "continueWithGoogle": "Continue with Google",
+    "redirecting": "Redirecting...",
+    "orDivider": "or",
+    "login": {
+      "title": "Log in",
+      "submit": "Log in",
+      "submitting": "Logging in...",
+      "forgotPassword": "Forgot password",
+      "noAccount": "Don't have an account?",
+      "signupLink": "Sign up"
+    },
+    "signup": {
+      "title": "Sign up",
+      "submit": "Create account",
+      "submitting": "Creating...",
+      "passwordHint": "At least 8 characters and 1 number.",
+      "confirmPasswordLabel": "Confirm password",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Log in",
+      "verifyTitle": "Check your email",
+      "verifyBody": "We sent a verification link to your email. Click it to continue.",
+      "verifyHint": "If you don't see it, check your spam folder.",
+      "verifyBackToLogin": "Back to login"
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "description": "Enter your email and we'll send you a reset link.",
+      "submit": "Send reset link",
+      "submitting": "Sending...",
+      "successMessage": "If this email is registered, we've sent a reset link. Check your spam folder too.",
+      "backToLogin": "Back to login"
+    },
+    "resetPassword": {
+      "title": "Set a new password",
+      "description": "Choose a new password for your account.",
+      "newPasswordLabel": "New password",
+      "submit": "Update password",
+      "submitting": "Updating..."
+    },
+    "errors": {
+      "generic": "Something went wrong. Please try again.",
+      "invalidCredentials": "Invalid email or password.",
+      "emailNotConfirmed": "Please confirm your email first.",
+      "emailAlreadyExists": "An account with this email already exists.",
+      "weakPassword": "Password too weak. Try a stronger one.",
+      "rateLimit": "Too many attempts. Please wait a bit.",
+      "linkExpired": "This link has expired. Request a new one.",
+      "notAuthenticated": "Your session expired. Please log in again.",
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Enter a valid email.",
+      "passwordRequired": "Password is required.",
+      "passwordTooShort": "Password must be at least 8 characters.",
+      "passwordNeedsNumber": "Password must contain at least 1 number.",
+      "passwordsDoNotMatch": "Passwords don't match."
+    }
+  },
+  "onboarding": {
+    "progress": "{current} / {total}",
+    "next": "Next",
+    "back": "Back",
+    "complete": "Complete",
+    "step1": {
+      "title": "Pick a username",
+      "description": "This appears on your profile and on leaderboards. You can change it later.",
+      "label": "Username",
+      "placeholder": "yourname",
+      "hint": "3-20 characters. Lowercase letters, numbers and _ allowed.",
+      "taken": "That username is taken."
+    },
+    "step2": {
+      "title": "What's your display name?",
+      "description": "This is the name shown on your profile and on leaderboards. You can change it anytime.",
+      "label": "Display name",
+      "placeholder": "Your name"
+    },
+    "step3": {
+      "title": "Unit preference",
+      "description": "Which unit do you prefer for weight?",
+      "kgLabel": "kg",
+      "kgSublabel": "Kilograms",
+      "lbLabel": "lb",
+      "lbSublabel": "Pounds"
+    },
+    "step4": {
+      "title": "Language",
+      "description": "Which language would you like to use?",
+      "tr": "TR",
+      "en": "EN"
+    },
+    "step5": {
+      "title": "Make your profile public?",
+      "description": "You can change this later in settings.",
+      "publicTitle": "Public",
+      "publicDesc": "If public, your friends can see you on leaderboards and visit your profile.",
+      "privateTitle": "Private",
+      "privateDesc": "If private, only you can see your data. You can change this anytime.",
+      "changeHint": "You can change this later in Settings."
+    },
+    "errors": {
+      "usernameTooShort": "Username must be at least 3 characters.",
+      "usernameTooLong": "Username can be at most 20 characters.",
+      "usernameInvalid": "Only lowercase letters, numbers and _ are allowed.",
+      "usernameTaken": "That username is taken.",
+      "displayNameRequired": "Display name is required.",
+      "displayNameTooLong": "Display name can be at most 50 characters."
+    }
+  },
+  "dashboard": {
+    "greetingPrefix": "Welcome,",
+    "welcome": "{name} 👋",
+    "startTitle": "Start a workout",
+    "newWorkout": "New Workout",
+    "comingSoonNote": "The workout flow is coming soon."
   }
 }
