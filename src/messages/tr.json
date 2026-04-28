@@ -212,6 +212,46 @@
       "generic": "Bir şeyler ters gitti."
     }
   },
+  "workouts": {
+    "start": {
+      "title": "Yeni Antrenman",
+      "activeExistsTitle": "Bitmemiş antrenmanın var",
+      "activeExistsBody": "Önce mevcut antrenmanını bitir veya iptal et, sonra yenisini başlatabilirsin.",
+      "continueActive": "Devam Et",
+      "discardActive": "İptal Et ve Yenisini Başlat",
+      "discardConfirmTitle": "Mevcut antrenmanı iptal et?",
+      "discardConfirmBody": "Bu işlem geri alınamaz. Girdiğin set verileri silinecek.",
+      "discardConfirm": "Evet, İptal Et",
+      "noActiveSplitTitle": "Aktif programın yok",
+      "noActiveSplitBody": "Antrenman başlatmak için önce bir program oluşturup aktif yapmalısın.",
+      "goToSplits": "Programlara Git",
+      "dayPickerLabel": "Bugün hangi gün?",
+      "splitLabel": "Aktif program",
+      "bodyWeightLabel": "Vücut ağırlığı",
+      "bodyWeightOptional": "(opsiyonel)",
+      "bodyWeightHint": "Boş bırakırsan kaydedilmez.",
+      "beginWorkout": "Antrenmana Başla",
+      "starting": "Başlatılıyor...",
+      "cancelling": "İptal ediliyor..."
+    },
+    "errors": {
+      "generic": "Bir şeyler ters gitti.",
+      "notFound": "Antrenman bulunamadı.",
+      "forbidden": "Bu antrenman sana ait değil.",
+      "activeExists": "Bitmemiş bir antrenmanın var.",
+      "weightInvalid": "Geçerli bir kilo gir.",
+      "weightTooLow": "Kilo 0'dan büyük olmalı.",
+      "weightTooHigh": "Kilo 1000'den küçük olmalı.",
+      "repsInvalid": "Geçerli bir tekrar sayısı gir.",
+      "repsTooLow": "Tekrar 0'dan büyük olmalı.",
+      "repsTooHigh": "Tekrar 1000'den küçük olmalı.",
+      "rpeInvalid": "Geçerli bir RPE gir.",
+      "rpeOutOfRange": "RPE 1.0 ile 10.0 arasında olmalı.",
+      "bodyWeightTooLow": "Vücut ağırlığı 0'dan büyük olmalı.",
+      "bodyWeightTooHigh": "Vücut ağırlığı 500'den küçük olmalı.",
+      "notesTooLong": "Not çok uzun."
+    }
+  },
   "muscles": {
     "chest": "Göğüs",
     "lats": "Kanatlar",

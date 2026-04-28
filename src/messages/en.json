@@ -212,6 +212,46 @@
       "generic": "Something went wrong."
     }
   },
+  "workouts": {
+    "start": {
+      "title": "New Workout",
+      "activeExistsTitle": "You have an unfinished workout",
+      "activeExistsBody": "Finish or discard your current workout before starting a new one.",
+      "continueActive": "Continue",
+      "discardActive": "Discard and Start New",
+      "discardConfirmTitle": "Discard current workout?",
+      "discardConfirmBody": "This cannot be undone. Your set data will be deleted.",
+      "discardConfirm": "Yes, Discard",
+      "noActiveSplitTitle": "No active program",
+      "noActiveSplitBody": "Create a program and mark it active before starting a workout.",
+      "goToSplits": "Go to Programs",
+      "dayPickerLabel": "Which day today?",
+      "splitLabel": "Active program",
+      "bodyWeightLabel": "Body weight",
+      "bodyWeightOptional": "(optional)",
+      "bodyWeightHint": "Leave empty to skip.",
+      "beginWorkout": "Start Workout",
+      "starting": "Starting...",
+      "cancelling": "Cancelling..."
+    },
+    "errors": {
+      "generic": "Something went wrong.",
+      "notFound": "Workout not found.",
+      "forbidden": "This workout isn't yours.",
+      "activeExists": "You have an unfinished workout.",
+      "weightInvalid": "Enter a valid weight.",
+      "weightTooLow": "Weight must be greater than 0.",
+      "weightTooHigh": "Weight must be less than 1000.",
+      "repsInvalid": "Enter a valid rep count.",
+      "repsTooLow": "Reps must be greater than 0.",
+      "repsTooHigh": "Reps must be less than 1000.",
+      "rpeInvalid": "Enter a valid RPE.",
+      "rpeOutOfRange": "RPE must be between 1.0 and 10.0.",
+      "bodyWeightTooLow": "Body weight must be greater than 0.",
+      "bodyWeightTooHigh": "Body weight must be less than 500.",
+      "notesTooLong": "Note too long."
+    }
+  },
   "muscles": {
     "chest": "Chest",
     "lats": "Lats",
