@@ -1,43 +1,235 @@
 import { useTranslations } from "next-intl";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useFormatter } from "next-intl";
+import { ChevronRight, Play, Plus } from "lucide-react";
+
 import { Container } from "@/components/layout/Container";
+import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
+import { Link, redirect } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
+import { formatWeight, type WeightUnit } from "@/lib/calculations/units";
+import { calculateWorkoutVolume, countWorkingSets } from "@/lib/calculations/volume";
+import { getActiveSplit } from "@/lib/db/splits";
+import { getActiveWorkout, getRecentWorkouts } from "@/lib/db/workouts";
 import { getCurrentUserWithProfile } from "@/lib/supabase/queries/profile";
 
-export default async function DashboardPage() {
+interface PageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export default async function DashboardPage({ params }: PageProps) {
+  const { locale } = await params;
+
   const session = await getCurrentUserWithProfile();
-  const displayName = session?.profile?.display_name ?? "";
+  if (!session) {
+    redirect({ href: "/login", locale });
+    return null;
+  }
+
+  const [active, split, recents] = await Promise.all([
+    getActiveWorkout(session.userId),
+    getActiveSplit(session.userId),
+    getRecentWorkouts(session.userId, 3),
+  ]);
+
+  const unit: WeightUnit = session.profile?.unit_preference === "lb" ? "lb" : "kg";
 
   return (
-    <Container className="py-8">
-      <DashboardContent displayName={displayName} />
+    <Container className="py-6 pb-24">
+      <DashboardContent
+        displayName={session.profile?.display_name ?? ""}
+        unit={unit}
+        activeWorkoutId={active?.id ?? null}
+        activeSplit={split ? { id: split.id, name: split.name } : null}
+        recents={recents.map((w) => {
+          const exForCalc = (w.exercises ?? []).map((e) => ({
+            sets: (e.sets ?? []).map((s) => ({
+              weight: s.weight,
+              reps: s.reps,
+              is_warmup: s.is_warmup,
+            })),
+          }));
+          return {
+            id: w.id,
+            date: w.date,
+            splitDayName: w.split_day?.name ?? null,
+            volumeKg: calculateWorkoutVolume(exForCalc),
+            workingSets: countWorkingSets(exForCalc),
+          };
+        })}
+      />
     </Container>
   );
 }
 
-function DashboardContent({ displayName }: { displayName: string }) {
+interface RecentWorkoutCard {
+  id: string;
+  date: string;
+  splitDayName: string | null;
+  volumeKg: number;
+  workingSets: number;
+}
+
+interface DashboardProps {
+  displayName: string;
+  unit: WeightUnit;
+  activeWorkoutId: string | null;
+  activeSplit: { id: string; name: string } | null;
+  recents: RecentWorkoutCard[];
+}
+
+function DashboardContent({
+  displayName,
+  unit,
+  activeWorkoutId,
+  activeSplit,
+  recents,
+}: DashboardProps) {
   const t = useTranslations("dashboard");
+  const tNav = useTranslations("nav");
 
   return (
     <div className="flex flex-col gap-6">
       <header>
         <p className="text-sm text-muted-foreground">{t("greetingPrefix")}</p>
-        <h1 className="text-3xl font-bold tracking-tight">{t("welcome", { name: displayName })}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          {t("welcome", { name: displayName })}
+        </h1>
       </header>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("startTitle")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Button size="lg" className="w-full sm:w-auto" disabled>
-            <Plus className="h-5 w-5" />
-            {t("newWorkout")}
-          </Button>
-          <p className="mt-3 text-xs text-muted-foreground">{t("comingSoonNote")}</p>
-        </CardContent>
-      </Card>
+      {activeWorkoutId ? (
+        <Link
+          href={`/workout/${activeWorkoutId}`}
+          className="flex items-center justify-between gap-3 rounded-lg border border-primary/40 bg-primary/5 p-4 transition-colors hover:bg-primary/10"
+        >
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-primary">
+              {t("activeWorkoutTitle")}
+            </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {t("activeWorkoutBody")}
+            </p>
+          </div>
+          <span
+            className={cn(
+              buttonVariants({ size: "sm" }),
+              "shrink-0",
+            )}
+          >
+            <Play className="h-3.5 w-3.5" />
+            {t("continueWorkout")}
+          </span>
+        </Link>
+      ) : activeSplit ? (
+        <ActiveSplitCard activeSplit={activeSplit} newWorkoutLabel={tNav("newWorkout")} />
+      ) : (
+        <NoActiveSplitCard />
+      )}
+
+      <RecentWorkoutsSection unit={unit} recents={recents} />
     </div>
+  );
+}
+
+function ActiveSplitCard({
+  activeSplit,
+  newWorkoutLabel,
+}: {
+  activeSplit: { id: string; name: string };
+  newWorkoutLabel: string;
+}) {
+  const t = useTranslations("dashboard");
+  return (
+    <section className="rounded-lg border bg-card p-4">
+      <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+        {t("activeSplitLabel")}
+      </p>
+      <h2 className="mt-1 truncate text-lg font-semibold">{activeSplit.name}</h2>
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+        <Link
+          href="/workout/new"
+          className={cn(buttonVariants({ size: "lg" }), "flex-1")}
+        >
+          <Plus className="h-4 w-4" />
+          {newWorkoutLabel}
+        </Link>
+        <Link
+          href="/splits"
+          className={cn(buttonVariants({ size: "lg", variant: "outline" }), "flex-1")}
+        >
+          {t("viewSplits")}
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+function NoActiveSplitCard() {
+  const t = useTranslations("dashboard");
+  return (
+    <section className="rounded-lg border bg-card p-6 text-center">
+      <h2 className="text-base font-semibold">{t("noActiveSplitTitle")}</h2>
+      <p className="mt-2 text-sm text-muted-foreground">{t("noActiveSplitBody")}</p>
+      <Link
+        href="/splits"
+        className={cn("mt-4 inline-flex", buttonVariants())}
+      >
+        {t("openSplits")}
+      </Link>
+    </section>
+  );
+}
+
+function RecentWorkoutsSection({
+  unit,
+  recents,
+}: {
+  unit: WeightUnit;
+  recents: RecentWorkoutCard[];
+}) {
+  const t = useTranslations("dashboard");
+  const fmt = useFormatter();
+  return (
+    <section>
+      <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        {t("recentTitle")}
+      </h2>
+      {recents.length === 0 ? (
+        <p className="rounded-lg border border-dashed bg-muted/30 p-4 text-sm text-muted-foreground">
+          {t("recentEmpty")}
+        </p>
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {recents.map((w) => (
+            <li
+              key={w.id}
+              className="flex items-center justify-between gap-3 rounded-lg border bg-card p-3"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">
+                  {w.splitDayName ?? "—"}
+                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {fmt.dateTime(new Date(w.date), {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <Badge variant="muted">
+                  {t("stats.sets", { count: w.workingSets })}
+                </Badge>
+                <Badge variant="outline">
+                  {formatWeight(w.volumeKg, unit)} {unit}
+                </Badge>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
