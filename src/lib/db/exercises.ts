@@ -46,6 +46,54 @@ export async function searchExercises(
 }
 
 /**
+ * Kullanıcının son 3 ayda yaptığı tüm hareketler, sıklığa göre sıralı.
+ * Workout'un split_day_id'si yoksa (ya da kullanıcı edit'te split silmişse)
+ * "Önerilenler" tab'ı için fallback olarak kullanılır.
+ */
+export async function getRecentExercisesForUser(
+  userId: string,
+  limit = 20,
+): Promise<ExerciseRow[]> {
+  const supabase = await createClient();
+  const since = new Date();
+  since.setMonth(since.getMonth() - 3);
+  const sinceDate = since.toISOString().slice(0, 10);
+
+  const { data: rows, error } = await supabase
+    .from("workout_exercises")
+    .select("exercise_id, workouts!inner(user_id, date)")
+    .eq("workouts.user_id", userId)
+    .gte("workouts.date", sinceDate);
+
+  if (error) {
+    console.error("getRecentExercisesForUser error:", error.message);
+    return [];
+  }
+
+  const freq = new Map<string, number>();
+  for (const row of rows ?? []) {
+    const id = row.exercise_id;
+    freq.set(id, (freq.get(id) ?? 0) + 1);
+  }
+  const ranked = [...freq.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([id]) => id);
+  if (ranked.length === 0) return [];
+
+  const { data: exercises, error: exErr } = await supabase
+    .from("exercises")
+    .select("*")
+    .in("id", ranked);
+  if (exErr) {
+    console.error("getRecentExercisesForUser (exercises) error:", exErr.message);
+    return [];
+  }
+  const byId = new Map((exercises ?? []).map((e) => [e.id, e] as const));
+  return ranked.map((id) => byId.get(id)).filter((e): e is ExerciseRow => Boolean(e));
+}
+
+/**
  * Bu split day için kullanıcının son 3 ayda eklediği hareketler, sıklığa göre sıralı.
  * UI'da "Önerilenler" tab'ında ilk gösterilir.
  */
