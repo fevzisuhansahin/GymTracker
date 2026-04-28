@@ -25,7 +25,7 @@ export async function rpcCreateSplitWithDays(
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("create_split_with_days", {
     p_name: input.name,
-    p_description: input.description,
+    p_description: input.description ?? undefined,
     p_days: input.days.map((d) => ({
       name: d.name,
       order_index: d.orderIndex,
@@ -55,7 +55,7 @@ export async function rpcUpdateSplitWithDays(
   const { data, error } = await supabase.rpc("update_split_with_days", {
     p_split_id: input.splitId,
     p_name: input.name,
-    p_description: input.description,
+    p_description: input.description ?? undefined,
     p_days: input.days.map((d) => ({
       id: d.id,
       name: d.name,
@@ -87,7 +87,7 @@ export async function rpcFinishWorkout(input: FinishWorkoutInput): Promise<strin
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("finish_workout", {
     p_workout_id: input.workoutId,
-    p_notes: input.notes,
+    p_notes: input.notes ?? undefined,
     p_duration_seconds: input.durationSeconds,
   });
   if (error) throw new Error(error.message);
