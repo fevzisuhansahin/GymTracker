@@ -283,6 +283,19 @@
       "newSubmitting": "Adding..."
     },
     "exerciseLabel": "Exercise",
+    "summary": {
+      "title": "Workout Summary",
+      "totalVolume": "Total Volume",
+      "totalSets": "Working Sets",
+      "duration": "Duration",
+      "newPRsTitle": "New PRs",
+      "noNewPRs": "No new PRs from this workout.",
+      "notesLabel": "Workout notes",
+      "notesPlaceholder": "General note (how you felt, what was tough, etc.)",
+      "notesSaved": "Saved",
+      "notesSaving": "Saving...",
+      "backToDashboard": "Back to Dashboard"
+    },
     "errors": {
       "generic": "Something went wrong.",
       "notFound": "Workout not found.",

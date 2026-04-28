@@ -283,6 +283,19 @@
       "newSubmitting": "Ekleniyor..."
     },
     "exerciseLabel": "Hareket",
+    "summary": {
+      "title": "Antrenman Özeti",
+      "totalVolume": "Toplam Volume",
+      "totalSets": "Çalışma Set Sayısı",
+      "duration": "Süre",
+      "newPRsTitle": "Yeni PR'lar",
+      "noNewPRs": "Bu antrenmanda yeni PR yok.",
+      "notesLabel": "Antrenman notu",
+      "notesPlaceholder": "Genel not (nasıl hissettin, hangi hareket zorladı vb.)",
+      "notesSaved": "Kaydedildi",
+      "notesSaving": "Kaydediliyor...",
+      "backToDashboard": "Dashboard'a Dön"
+    },
     "errors": {
       "generic": "Bir şeyler ters gitti.",
       "notFound": "Antrenman bulunamadı.",
