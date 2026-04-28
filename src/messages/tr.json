@@ -234,6 +234,55 @@
       "starting": "Başlatılıyor...",
       "cancelling": "İptal ediliyor..."
     },
+    "editor": {
+      "splitNoneLabel": "Sadece kardiyo / programsız",
+      "elapsed": "Süre",
+      "bodyWeightShort": "Vücut ağırlığı",
+      "addExercise": "Hareket Ekle",
+      "noExercisesYet": "Henüz hareket eklenmedi. \"Hareket Ekle\" ile başla.",
+      "addSet": "Set Ekle",
+      "removeExercise": "Hareketi sil",
+      "exerciseNotes": "Notlar",
+      "exerciseNotesPlaceholder": "Bu hareket için kısa not (Smith Machine plate setup, form ipucu vb.)",
+      "showNotes": "Not ekle",
+      "hideNotes": "Notu kapat",
+      "removeExerciseConfirmTitle": "Bu hareketi sil?",
+      "removeExerciseConfirmBody": "Bu hareket ve tüm setleri silinecek.",
+      "finishWorkout": "Antrenmanı Bitir",
+      "finishing": "Kaydediliyor...",
+      "exitConfirmTitle": "Antrenmandan çık?",
+      "exitConfirmBody": "Antrenman açık kalır, daha sonra devam edebilirsin."
+    },
+    "set": {
+      "weightLabel": "Kg",
+      "weightLabelLb": "Lb",
+      "repsLabel": "Tekrar",
+      "rpeLabel": "RPE",
+      "warmupLabel": "Isınma",
+      "completeAria": "Set tamamlandı işareti",
+      "deleteAria": "Set sil",
+      "expandDetails": "Detaylar",
+      "saving": "Kaydediliyor...",
+      "saved": "Kaydedildi",
+      "saveFailed": "Kaydedilemedi"
+    },
+    "selector": {
+      "title": "Hareket ekle",
+      "tabRecommended": "Önerilenler",
+      "tabAll": "Tümü",
+      "tabNew": "Yeni Ekle",
+      "searchPlaceholder": "Hareket ara...",
+      "filterAll": "Hepsi",
+      "noRecommended": "Bu güne henüz hiç hareket eklemedin. \"Tümü\" sekmesinden seç.",
+      "noResults": "Sonuç bulunamadı.",
+      "addCount": "{count, plural, =0 {Seç} one {1 hareketi ekle} other {# hareketi ekle}}",
+      "newName": "Hareket adı",
+      "newPrimary": "Birincil kas",
+      "newEquipment": "Ekipman",
+      "newSubmit": "Oluştur ve ekle",
+      "newSubmitting": "Ekleniyor..."
+    },
+    "exerciseLabel": "Hareket",
     "errors": {
       "generic": "Bir şeyler ters gitti.",
       "notFound": "Antrenman bulunamadı.",
@@ -250,6 +299,23 @@
       "bodyWeightTooLow": "Vücut ağırlığı 0'dan büyük olmalı.",
       "bodyWeightTooHigh": "Vücut ağırlığı 500'den küçük olmalı.",
       "notesTooLong": "Not çok uzun."
+    }
+  },
+  "equipment": {
+    "barbell": "Halter",
+    "dumbbell": "Dambıl",
+    "cable": "Kablo",
+    "machine": "Makine",
+    "smith_machine": "Smith Machine",
+    "bodyweight": "Vücut ağırlığı",
+    "other": "Diğer"
+  },
+  "exercises": {
+    "errors": {
+      "nameTooShort": "Hareket adı en az 2 karakter olmalı.",
+      "nameTooLong": "Hareket adı en fazla 80 karakter olabilir.",
+      "duplicate": "Bu isimde bir hareketin zaten var.",
+      "generic": "Hareket eklenemedi."
     }
   },
   "muscles": {

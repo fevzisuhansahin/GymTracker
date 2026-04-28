@@ -234,6 +234,55 @@
       "starting": "Starting...",
       "cancelling": "Cancelling..."
     },
+    "editor": {
+      "splitNoneLabel": "Cardio only / no program",
+      "elapsed": "Elapsed",
+      "bodyWeightShort": "Body weight",
+      "addExercise": "Add Exercise",
+      "noExercisesYet": "No exercises yet. Tap \"Add Exercise\" to start.",
+      "addSet": "Add Set",
+      "removeExercise": "Remove exercise",
+      "exerciseNotes": "Notes",
+      "exerciseNotesPlaceholder": "Short note for this exercise (Smith Machine plate setup, form cue, etc.)",
+      "showNotes": "Add notes",
+      "hideNotes": "Hide notes",
+      "removeExerciseConfirmTitle": "Remove this exercise?",
+      "removeExerciseConfirmBody": "This exercise and all its sets will be deleted.",
+      "finishWorkout": "Finish Workout",
+      "finishing": "Saving...",
+      "exitConfirmTitle": "Leave workout?",
+      "exitConfirmBody": "The workout stays open; you can resume later."
+    },
+    "set": {
+      "weightLabel": "Kg",
+      "weightLabelLb": "Lb",
+      "repsLabel": "Reps",
+      "rpeLabel": "RPE",
+      "warmupLabel": "Warmup",
+      "completeAria": "Mark set complete",
+      "deleteAria": "Delete set",
+      "expandDetails": "Details",
+      "saving": "Saving...",
+      "saved": "Saved",
+      "saveFailed": "Couldn't save"
+    },
+    "selector": {
+      "title": "Add exercise",
+      "tabRecommended": "Recommended",
+      "tabAll": "All",
+      "tabNew": "New",
+      "searchPlaceholder": "Search exercises...",
+      "filterAll": "All",
+      "noRecommended": "You haven't added any exercises to this day yet. Pick from \"All\".",
+      "noResults": "No results.",
+      "addCount": "{count, plural, =0 {Pick} one {Add 1 exercise} other {Add # exercises}}",
+      "newName": "Exercise name",
+      "newPrimary": "Primary muscle",
+      "newEquipment": "Equipment",
+      "newSubmit": "Create and add",
+      "newSubmitting": "Adding..."
+    },
+    "exerciseLabel": "Exercise",
     "errors": {
       "generic": "Something went wrong.",
       "notFound": "Workout not found.",
@@ -250,6 +299,23 @@
       "bodyWeightTooLow": "Body weight must be greater than 0.",
       "bodyWeightTooHigh": "Body weight must be less than 500.",
       "notesTooLong": "Note too long."
+    }
+  },
+  "equipment": {
+    "barbell": "Barbell",
+    "dumbbell": "Dumbbell",
+    "cable": "Cable",
+    "machine": "Machine",
+    "smith_machine": "Smith Machine",
+    "bodyweight": "Bodyweight",
+    "other": "Other"
+  },
+  "exercises": {
+    "errors": {
+      "nameTooShort": "Exercise name must be at least 2 characters.",
+      "nameTooLong": "Exercise name can be at most 80 characters.",
+      "duplicate": "You already have an exercise with this name.",
+      "generic": "Couldn't add exercise."
     }
   },
   "muscles": {
