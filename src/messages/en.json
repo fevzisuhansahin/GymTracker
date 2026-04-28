@@ -304,6 +304,7 @@
       "duration": "Duration",
       "newPRsTitle": "New PRs",
       "noNewPRs": "No new PRs from this workout.",
+      "newPr": "New PR: {value} (est. 1RM)",
       "notesLabel": "Workout notes",
       "notesPlaceholder": "General note (how you felt, what was tough, etc.)",
       "notesSaved": "Saved",

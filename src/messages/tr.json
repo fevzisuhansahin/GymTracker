@@ -304,6 +304,7 @@
       "duration": "Süre",
       "newPRsTitle": "Yeni PR'lar",
       "noNewPRs": "Bu antrenmanda yeni PR yok.",
+      "newPr": "Yeni PR: {value} (tahmini 1TM)",
       "notesLabel": "Antrenman notu",
       "notesPlaceholder": "Genel not (nasıl hissettin, hangi hareket zorladı vb.)",
       "notesSaved": "Kaydedildi",

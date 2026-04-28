@@ -95,7 +95,9 @@ export function SummaryClient({
                   <span className="font-medium">{pr.exerciseName}</span>
                 </div>
                 <Badge variant="success">
-                  {formatWeight(pr.value, unitPreference)} {unitPreference}
+                  {t("newPr", {
+                    value: `${formatWeight(pr.value, unitPreference)} ${unitPreference}`,
+                  })}
                 </Badge>
               </li>
             ))}
