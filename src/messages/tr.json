@@ -190,6 +190,8 @@
       "saveUpdate": "Kaydet",
       "saving": "Kaydediliyor...",
       "deletePrompt": "Bu programı silmek istediğine emin misin? Bu işlem geri alınamaz.",
+      "confirmEditTitle": "Programı güncelle?",
+      "affectedWorkoutsWarning": "{count, plural, =0 {Hiçbir geçmiş antrenman etkilenmez.} one {# geçmiş antrenmanın bağlı olduğu gün(ler) silinecek; bu antrenmanların program günü bilgisi kalkar.} other {# geçmiş antrenmanın bağlı olduğu gün(ler) silinecek; bu antrenmanların program günü bilgisi kalkar.}}",
       "createSuccess": "Program oluşturuldu.",
       "updateSuccess": "Program güncellendi.",
       "deleteSuccess": "Program silindi.",

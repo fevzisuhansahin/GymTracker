@@ -190,6 +190,8 @@
       "saveUpdate": "Save",
       "saving": "Saving...",
       "deletePrompt": "Are you sure you want to delete this program? This cannot be undone.",
+      "confirmEditTitle": "Update program?",
+      "affectedWorkoutsWarning": "{count, plural, =0 {No past workouts will be affected.} one {# past workout is linked to day(s) being removed; that workout will lose its program-day reference.} other {# past workouts are linked to day(s) being removed; those workouts will lose their program-day reference.}}",
       "createSuccess": "Program created.",
       "updateSuccess": "Program updated.",
       "deleteSuccess": "Program deleted.",
