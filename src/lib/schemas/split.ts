@@ -49,3 +49,28 @@ export const splitFormSchema = z.object({
     .max(7, { message: "splits.errors.dayCountTooHigh" }),
 });
 export type SplitFormInput = z.infer<typeof splitFormSchema>;
+
+// Update form: each day may carry its existing id (rename/reorder preserves
+// it) or be null/undefined for newly added days.
+export const updateSplitDayInputSchema = splitDayInputSchema.extend({
+  id: z.string().uuid().nullable(),
+});
+export type UpdateSplitDayInput = z.infer<typeof updateSplitDayInputSchema>;
+
+export const updateSplitFormSchema = z.object({
+  splitId: z.string().uuid(),
+  name: z
+    .string()
+    .min(1, { message: "splits.errors.nameRequired" })
+    .max(80, { message: "splits.errors.nameTooLong" }),
+  description: z
+    .string()
+    .max(500, { message: "splits.errors.descriptionTooLong" })
+    .nullable()
+    .transform((v) => (v && v.trim().length > 0 ? v.trim() : null)),
+  days: z
+    .array(updateSplitDayInputSchema)
+    .min(1, { message: "splits.errors.dayCountTooLow" })
+    .max(7, { message: "splits.errors.dayCountTooHigh" }),
+});
+export type UpdateSplitFormInput = z.infer<typeof updateSplitFormSchema>;

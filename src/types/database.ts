@@ -418,6 +418,15 @@ export type Database = {
         Args: { p_template_id: string }
         Returns: string
       }
+      update_split_with_days: {
+        Args: {
+          p_split_id: string
+          p_name: string
+          p_description: string | null
+          p_days: Json
+        }
+        Returns: string
+      }
       finish_workout: {
         Args: { p_workout_id: string; p_notes: string | null; p_duration_seconds: number }
         Returns: string

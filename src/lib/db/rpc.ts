@@ -37,6 +37,36 @@ export async function rpcCreateSplitWithDays(
   return data;
 }
 
+export interface UpdateSplitWithDaysInput {
+  splitId: string;
+  name: string;
+  description: string | null;
+  days: Array<{
+    id: string | null;
+    name: string;
+    targetMuscleGroups: string[];
+  }>;
+}
+
+export async function rpcUpdateSplitWithDays(
+  input: UpdateSplitWithDaysInput,
+): Promise<string> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("update_split_with_days", {
+    p_split_id: input.splitId,
+    p_name: input.name,
+    p_description: input.description,
+    p_days: input.days.map((d) => ({
+      id: d.id,
+      name: d.name,
+      target_muscle_groups: d.targetMuscleGroups,
+    })),
+  });
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("rpc_no_data");
+  return data;
+}
+
 export async function rpcCopyTemplateSplit(templateId: string): Promise<string> {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("copy_template_split", {
