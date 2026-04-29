@@ -73,6 +73,15 @@ export default async function SummaryPage({ params }: PageProps) {
     })),
   );
 
+  const cardioTotalSeconds = workout.cardioSessions.reduce(
+    (sum, cs) => sum + cs.duration_seconds,
+    0,
+  );
+  const cardioTotalDistanceKm = workout.cardioSessions.reduce(
+    (sum, cs) => sum + (cs.distance_km ?? 0),
+    0,
+  );
+
   return (
     <Container className="py-6 pb-24">
       <SummaryClient
@@ -83,6 +92,8 @@ export default async function SummaryPage({ params }: PageProps) {
         durationSeconds={workout.duration_seconds ?? 0}
         prs={prs}
         initialNotes={workout.notes ?? ""}
+        cardioTotalSeconds={cardioTotalSeconds}
+        cardioTotalDistanceKm={cardioTotalDistanceKm}
       />
     </Container>
   );

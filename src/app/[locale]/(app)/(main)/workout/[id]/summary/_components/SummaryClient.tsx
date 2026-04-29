@@ -27,6 +27,8 @@ interface Props {
   durationSeconds: number;
   prs: PRRow[];
   initialNotes: string;
+  cardioTotalSeconds: number;
+  cardioTotalDistanceKm: number;
 }
 
 type SaveState = "idle" | "saving" | "saved" | "error";
@@ -56,8 +58,11 @@ export function SummaryClient({
   durationSeconds,
   prs,
   initialNotes,
+  cardioTotalSeconds,
+  cardioTotalDistanceKm,
 }: Props) {
   const t = useTranslations("workouts.summary");
+  const tCardio = useTranslations("cardio");
 
   return (
     <div className="flex flex-col gap-6">
@@ -73,6 +78,18 @@ export function SummaryClient({
         />
         <Stat label={t("totalSets")} value={String(workingSets)} />
         <Stat label={t("duration")} value={formatDuration(durationSeconds)} />
+        {cardioTotalSeconds > 0 && (
+          <Stat
+            label={tCardio("summaryDuration")}
+            value={formatDuration(cardioTotalSeconds)}
+          />
+        )}
+        {cardioTotalDistanceKm > 0 && (
+          <Stat
+            label={tCardio("summaryDistance")}
+            value={`${cardioTotalDistanceKm.toFixed(2)} km`}
+          />
+        )}
       </section>
 
       <section>

@@ -10,9 +10,13 @@ import {
   finishWorkoutSchema,
   updateBodyWeightSchema,
   exerciseNotesSchema,
+  cardioSessionSchema,
   type SetUpsertInput,
   type FinishWorkoutInput,
+  type CardioSessionInput,
 } from "@/lib/schemas/workout";
+import type { WorkoutHistoryItem } from "@/lib/db/workouts";
+import { getWorkoutHistory } from "@/lib/db/workouts";
 import { customExerciseSchema, type CustomExerciseInput } from "@/lib/schemas/exercise";
 import { rpcFinishWorkout } from "@/lib/db/rpc";
 
@@ -539,6 +543,202 @@ export async function finishWorkoutAction(
 
   revalidatePath("/dashboard");
   redirect(`/workout/${parsed.data.workoutId}/summary`);
+}
+
+// ---------------------------------------------------------------------------
+// assertCardioOwner — cardio_sessions için ownership kontrolü
+// ---------------------------------------------------------------------------
+async function assertCardioOwner(
+  sessionId: string,
+  userId: string,
+): Promise<{ ok: true; workoutId: string } | { ok: false; errorKey: string }> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("cardio_sessions")
+    .select("workout_id, workouts!inner(user_id)")
+    .eq("id", sessionId)
+    .maybeSingle();
+  if (error || !data) return { ok: false, errorKey: "workouts.errors.notFound" };
+  const owner = (data.workouts as { user_id: string }).user_id;
+  if (owner !== userId) return { ok: false, errorKey: "workouts.errors.forbidden" };
+  return { ok: true, workoutId: data.workout_id };
+}
+
+// ---------------------------------------------------------------------------
+// addCardioSessionAction
+// ---------------------------------------------------------------------------
+export interface AddCardioResult {
+  ok: boolean;
+  errorKey?: string;
+  fieldErrors?: Record<string, string>;
+  sessionId?: string;
+}
+
+export async function addCardioSessionAction(
+  workoutId: string,
+  data: CardioSessionInput,
+): Promise<AddCardioResult> {
+  const parsed = cardioSessionSchema.safeParse(data);
+  if (!parsed.success) {
+    return { ok: false, fieldErrors: flattenZodErrors(parsed.error) };
+  }
+
+  const auth = await requireUserId();
+  if ("errorKey" in auth) return { ok: false, errorKey: auth.errorKey };
+
+  const ownership = await assertWorkoutOwner(workoutId, auth.userId);
+  if (!ownership.ok) return { ok: false, errorKey: ownership.errorKey };
+
+  const supabase = await createClient();
+
+  const { data: existing, error: existErr } = await supabase
+    .from("cardio_sessions")
+    .select("order_index")
+    .eq("workout_id", workoutId);
+  if (existErr) {
+    console.error("addCardioSessionAction (existing):", existErr);
+    return { ok: false, errorKey: "workouts.errors.generic" };
+  }
+  const maxOrder = (existing ?? []).reduce(
+    (m, r) => (r.order_index > m ? r.order_index : m),
+    0,
+  );
+
+  const { data: inserted, error: insErr } = await supabase
+    .from("cardio_sessions")
+    .insert({
+      workout_id: workoutId,
+      machine_type: parsed.data.machineType,
+      duration_seconds: parsed.data.durationSeconds,
+      distance_km: parsed.data.distanceKm,
+      avg_speed: parsed.data.avgSpeed,
+      incline_percent: parsed.data.inclinePercent,
+      resistance_level: parsed.data.resistanceLevel,
+      calories: parsed.data.calories,
+      avg_heart_rate: parsed.data.avgHeartRate,
+      notes: parsed.data.notes,
+      order_index: maxOrder + 1,
+    })
+    .select("id")
+    .maybeSingle();
+
+  if (insErr || !inserted) {
+    console.error("addCardioSessionAction (insert):", insErr);
+    return { ok: false, errorKey: "workouts.errors.generic" };
+  }
+
+  revalidatePath(`/workout/${workoutId}`);
+  return { ok: true, sessionId: inserted.id };
+}
+
+// ---------------------------------------------------------------------------
+// updateCardioSessionAction
+// ---------------------------------------------------------------------------
+export async function updateCardioSessionAction(
+  sessionId: string,
+  data: CardioSessionInput,
+): Promise<{ ok: boolean; errorKey?: string; fieldErrors?: Record<string, string> }> {
+  const parsed = cardioSessionSchema.safeParse(data);
+  if (!parsed.success) {
+    return { ok: false, fieldErrors: flattenZodErrors(parsed.error) };
+  }
+
+  const auth = await requireUserId();
+  if ("errorKey" in auth) return { ok: false, errorKey: auth.errorKey };
+
+  const ownership = await assertCardioOwner(sessionId, auth.userId);
+  if (!ownership.ok) return { ok: false, errorKey: ownership.errorKey };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("cardio_sessions")
+    .update({
+      machine_type: parsed.data.machineType,
+      duration_seconds: parsed.data.durationSeconds,
+      distance_km: parsed.data.distanceKm,
+      avg_speed: parsed.data.avgSpeed,
+      incline_percent: parsed.data.inclinePercent,
+      resistance_level: parsed.data.resistanceLevel,
+      calories: parsed.data.calories,
+      avg_heart_rate: parsed.data.avgHeartRate,
+      notes: parsed.data.notes,
+    })
+    .eq("id", sessionId);
+
+  if (error) {
+    console.error("updateCardioSessionAction:", error);
+    return { ok: false, errorKey: "workouts.errors.generic" };
+  }
+
+  revalidatePath(`/workout/${ownership.workoutId}`);
+  return { ok: true };
+}
+
+// ---------------------------------------------------------------------------
+// deleteCardioSessionAction
+// ---------------------------------------------------------------------------
+export async function deleteCardioSessionAction(
+  sessionId: string,
+): Promise<{ ok: boolean; errorKey?: string }> {
+  const auth = await requireUserId();
+  if ("errorKey" in auth) return { ok: false, errorKey: auth.errorKey };
+
+  const ownership = await assertCardioOwner(sessionId, auth.userId);
+  if (!ownership.ok) return { ok: false, errorKey: ownership.errorKey };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("cardio_sessions")
+    .delete()
+    .eq("id", sessionId);
+  if (error) {
+    console.error("deleteCardioSessionAction:", error);
+    return { ok: false, errorKey: "workouts.errors.generic" };
+  }
+
+  revalidatePath(`/workout/${ownership.workoutId}`);
+  return { ok: true };
+}
+
+// ---------------------------------------------------------------------------
+// deleteWorkoutAction — ownership check + DELETE (CASCADE). Geçmiş detaydan çağrılır.
+// ---------------------------------------------------------------------------
+export async function deleteWorkoutAction(
+  workoutId: string,
+): Promise<{ ok: boolean; errorKey?: string }> {
+  const auth = await requireUserId();
+  if ("errorKey" in auth) return { ok: false, errorKey: auth.errorKey };
+
+  const ownership = await assertWorkoutOwner(workoutId, auth.userId);
+  if (!ownership.ok) return { ok: false, errorKey: ownership.errorKey };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("workouts")
+    .delete()
+    .eq("id", workoutId)
+    .eq("user_id", auth.userId);
+  if (error) {
+    console.error("deleteWorkoutAction:", error);
+    return { ok: false, errorKey: "workouts.errors.generic" };
+  }
+  revalidatePath("/history");
+  revalidatePath("/dashboard");
+  redirect("/history");
+}
+
+// ---------------------------------------------------------------------------
+// getWorkoutHistoryAction — client'tan "load more" için
+// ---------------------------------------------------------------------------
+export async function getWorkoutHistoryAction(
+  offset: number,
+  limit: number,
+): Promise<{ ok: boolean; errorKey?: string; items?: WorkoutHistoryItem[] }> {
+  const auth = await requireUserId();
+  if ("errorKey" in auth) return { ok: false, errorKey: auth.errorKey };
+
+  const items = await getWorkoutHistory(auth.userId, offset, limit);
+  return { ok: true, items };
 }
 
 // ---------------------------------------------------------------------------

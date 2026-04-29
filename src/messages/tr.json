@@ -246,14 +246,16 @@
       "bodyWeightHint": "Boş bırakırsan kaydedilmez.",
       "beginWorkout": "Antrenmana Başla",
       "starting": "Başlatılıyor...",
-      "cancelling": "İptal ediliyor..."
+      "cancelling": "İptal ediliyor...",
+      "cardioOnly": "Sadece Kardiyo Başlat"
     },
     "editor": {
       "splitNoneLabel": "Sadece kardiyo / programsız",
       "elapsed": "Süre",
       "bodyWeightShort": "Vücut ağırlığı",
       "addExercise": "Hareket Ekle",
-      "noExercisesYet": "Henüz hareket eklenmedi. \"Hareket Ekle\" ile başla.",
+      "addCardio": "Kardiyo Ekle",
+      "noExercisesYet": "Henüz içerik eklenmedi. Hareket veya kardiyo ekleyerek başla.",
       "addSet": "Set Ekle",
       "removeExercise": "Hareketi sil",
       "exerciseNotes": "Notlar",
@@ -328,6 +330,78 @@
       "bodyWeightTooHigh": "Vücut ağırlığı 500'den küçük olmalı.",
       "notesTooLong": "Not çok uzun."
     }
+  },
+  "cardio": {
+    "label": "Kardiyo",
+    "addTitle": "Kardiyo Seansı Ekle",
+    "editTitle": "Kardiyo Seansını Düzenle",
+    "machineLabel": "Makine Tipi",
+    "durationHint": "ör: 7:30 (dk:sn) veya 30 (dk)",
+    "notesPlaceholder": "Kısa not...",
+    "summaryDuration": "Kardiyo Süresi",
+    "summaryDistance": "Kardiyo Mesafesi",
+    "deleteConfirmTitle": "Bu kardiyo seansını sil?",
+    "deleteConfirmBody": "Bu işlem geri alınamaz.",
+    "machines": {
+      "treadmill": "Koşu Bandı",
+      "bike": "Bisiklet",
+      "elliptical": "Eliptik",
+      "rowing": "Kürek",
+      "stairmaster": "Merdiven",
+      "outdoor_run": "Dış Mekan Koşu",
+      "other": "Diğer"
+    },
+    "fields": {
+      "duration": "Süre",
+      "distance": "Mesafe",
+      "speed": "Hız",
+      "incline": "Eğim",
+      "resistance": "Direnç",
+      "calories": "Kalori",
+      "notes": "Not"
+    },
+    "errors": {
+      "durationRequired": "Geçerli bir süre gir (ör: 7:30 veya 30)."
+    }
+  },
+  "history": {
+    "title": "Geçmiş",
+    "filterAll": "Tümü",
+    "filterStrength": "Ağırlık",
+    "filterCardio": "Kardiyo",
+    "emptyAll": "Henüz tamamlanmış antrenman yok.",
+    "emptyFiltered": "Bu filtrede gösterilecek antrenman yok.",
+    "loadMore": "Daha Fazla Yükle",
+    "loading": "Yükleniyor...",
+    "allLoaded": "Tüm antrenmanlar yüklendi.",
+    "sets": "{count, plural, =0 {set yok} one {# set} other {# set}}",
+    "cardioOnly": "Kardiyo",
+    "freeWorkout": "Serbest Antrenman",
+    "today": "Bugün",
+    "yesterday": "Dün",
+    "daysAgo": "{count} gün önce"
+  },
+  "workoutDetail": {
+    "title": "Antrenman Detayı",
+    "splitLabel": "Program Günü",
+    "noSplitDay": "Program yok",
+    "durationLabel": "Süre",
+    "bodyWeightLabel": "Vücut Ağırlığı",
+    "exercisesTitle": "Hareketler",
+    "noExercises": "Bu antrenmanda hareket yok.",
+    "cardioTitle": "Kardiyo",
+    "noCardio": "Bu antrenmanda kardiyo yok.",
+    "notesLabel": "Antrenman Notu",
+    "totalVolume": "Toplam Volume",
+    "workingSets": "Çalışma Set",
+    "prBadge": "PR",
+    "deleteTitle": "Sil",
+    "deleteConfirmTitle": "Bu antrenmanı silmek istediğinden emin misin?",
+    "deleteConfirmBody": "Bu işlem geri alınamaz. Tüm set ve kardiyo verileri silinir.",
+    "deleteConfirm": "Evet, Sil",
+    "setNumber": "#{n}",
+    "warmup": "Isınma",
+    "rpe": "RPE"
   },
   "equipment": {
     "barbell": "Halter",

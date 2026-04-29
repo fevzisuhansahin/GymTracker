@@ -1,5 +1,32 @@
 import { z } from "zod";
 
+export const MACHINE_TYPES = [
+  "treadmill",
+  "bike",
+  "elliptical",
+  "rowing",
+  "stairmaster",
+  "outdoor_run",
+  "other",
+] as const;
+export type MachineType = (typeof MACHINE_TYPES)[number];
+
+export const cardioSessionSchema = z.object({
+  machineType: z.enum(MACHINE_TYPES),
+  durationSeconds: z
+    .number({ message: "cardio.errors.durationRequired" })
+    .int()
+    .min(1, { message: "cardio.errors.durationRequired" }),
+  distanceKm: z.number().gt(0).lt(1000).nullable(),
+  avgSpeed: z.number().gt(0).lt(300).nullable(),
+  inclinePercent: z.number().gte(0).lt(100).nullable(),
+  resistanceLevel: z.number().int().gte(1).lt(100).nullable(),
+  calories: z.number().int().gt(0).lt(10000).nullable(),
+  avgHeartRate: z.number().int().gt(0).lt(300).nullable(),
+  notes: z.string().max(500, { message: "workouts.errors.notesTooLong" }).nullable(),
+});
+export type CardioSessionInput = z.infer<typeof cardioSessionSchema>;
+
 // DB constraint: 0 < weight < 1000 (kg). UI input is in user's preference unit
 // (kg or lb) and must be normalized to kg before persistence.
 export const weightKgSchema = z

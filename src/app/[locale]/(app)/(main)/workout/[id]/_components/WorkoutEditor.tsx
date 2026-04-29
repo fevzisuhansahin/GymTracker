@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Loader2, Plus, Trophy } from "lucide-react";
+import { Bike, Loader2, Plus, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 import { Container } from "@/components/layout/Container";
@@ -23,6 +23,8 @@ import {
 
 import { ExerciseCard, type ExerciseCardData } from "./ExerciseCard";
 import { ExerciseSelector } from "./ExerciseSelector";
+import { CardioSessionCard, type CardioSessionData } from "./CardioSessionCard";
+import { CardioForm } from "./CardioForm";
 
 export interface WorkoutData {
   id: string;
@@ -31,6 +33,7 @@ export interface WorkoutData {
   splitDayName: string | null;
   splitDayId: string | null;
   exercises: ExerciseCardData[];
+  cardioSessions: CardioSessionData[];
 }
 
 interface Props {
@@ -81,6 +84,7 @@ export function WorkoutEditor({ unitPreference, workout }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [selectorOpen, setSelectorOpen] = useState(false);
+  const [cardioFormOpen, setCardioFormOpen] = useState(false);
 
   const startedAtMs = new Date(workout.startedAt).getTime();
   const elapsed = useElapsedSeconds(startedAtMs);
@@ -107,7 +111,8 @@ export function WorkoutEditor({ unitPreference, workout }: Props) {
     });
   }
 
-  const hasNoExercises = workout.exercises.length === 0;
+  const hasNoContent =
+    workout.exercises.length === 0 && workout.cardioSessions.length === 0;
 
   return (
     <Container className="py-4 pb-32">
@@ -130,7 +135,7 @@ export function WorkoutEditor({ unitPreference, workout }: Props) {
       </header>
 
       <main className="mt-5 flex flex-col gap-4">
-        {hasNoExercises && (
+        {hasNoContent && (
           <div className="rounded-lg border border-dashed bg-muted/30 p-6 text-center text-sm text-muted-foreground">
             {t("noExercisesYet")}
           </div>
@@ -145,15 +150,30 @@ export function WorkoutEditor({ unitPreference, workout }: Props) {
           />
         ))}
 
-        <Button
-          variant="outline"
-          onClick={() => setSelectorOpen(true)}
-          className="w-full"
-          disabled={pending}
-        >
-          <Plus className="h-4 w-4" />
-          {t("addExercise")}
-        </Button>
+        {workout.cardioSessions.map((cs) => (
+          <CardioSessionCard key={cs.id} workoutId={workout.id} data={cs} />
+        ))}
+
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setSelectorOpen(true)}
+            className="flex-1"
+            disabled={pending}
+          >
+            <Plus className="h-4 w-4" />
+            {t("addExercise")}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setCardioFormOpen(true)}
+            className="flex-1"
+            disabled={pending}
+          >
+            <Bike className="h-4 w-4" />
+            {t("addCardio")}
+          </Button>
+        </div>
       </main>
 
       <div
@@ -188,6 +208,16 @@ export function WorkoutEditor({ unitPreference, workout }: Props) {
         excludeExerciseIds={workout.exercises.map((we) => we.exercise.id)}
         onAdded={() => {
           setSelectorOpen(false);
+          router.refresh();
+        }}
+      />
+
+      <CardioForm
+        workoutId={workout.id}
+        open={cardioFormOpen}
+        onOpenChange={setCardioFormOpen}
+        onSaved={() => {
+          setCardioFormOpen(false);
           router.refresh();
         }}
       />

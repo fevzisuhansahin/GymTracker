@@ -246,14 +246,16 @@
       "bodyWeightHint": "Leave empty to skip.",
       "beginWorkout": "Start Workout",
       "starting": "Starting...",
-      "cancelling": "Cancelling..."
+      "cancelling": "Cancelling...",
+      "cardioOnly": "Cardio Only"
     },
     "editor": {
       "splitNoneLabel": "Cardio only / no program",
       "elapsed": "Elapsed",
       "bodyWeightShort": "Body weight",
       "addExercise": "Add Exercise",
-      "noExercisesYet": "No exercises yet. Tap \"Add Exercise\" to start.",
+      "addCardio": "Add Cardio",
+      "noExercisesYet": "Nothing added yet. Add an exercise or cardio session to start.",
       "addSet": "Add Set",
       "removeExercise": "Remove exercise",
       "exerciseNotes": "Notes",
@@ -328,6 +330,78 @@
       "bodyWeightTooHigh": "Body weight must be less than 500.",
       "notesTooLong": "Note too long."
     }
+  },
+  "cardio": {
+    "label": "Cardio",
+    "addTitle": "Add Cardio Session",
+    "editTitle": "Edit Cardio Session",
+    "machineLabel": "Machine Type",
+    "durationHint": "e.g. 7:30 (mm:ss) or 30 (minutes)",
+    "notesPlaceholder": "Short note...",
+    "summaryDuration": "Cardio Duration",
+    "summaryDistance": "Cardio Distance",
+    "deleteConfirmTitle": "Delete this cardio session?",
+    "deleteConfirmBody": "This cannot be undone.",
+    "machines": {
+      "treadmill": "Treadmill",
+      "bike": "Bike",
+      "elliptical": "Elliptical",
+      "rowing": "Rowing",
+      "stairmaster": "Stairmaster",
+      "outdoor_run": "Outdoor Run",
+      "other": "Other"
+    },
+    "fields": {
+      "duration": "Duration",
+      "distance": "Distance",
+      "speed": "Speed",
+      "incline": "Incline",
+      "resistance": "Resistance",
+      "calories": "Calories",
+      "notes": "Notes"
+    },
+    "errors": {
+      "durationRequired": "Enter a valid duration (e.g. 7:30 or 30)."
+    }
+  },
+  "history": {
+    "title": "History",
+    "filterAll": "All",
+    "filterStrength": "Strength",
+    "filterCardio": "Cardio",
+    "emptyAll": "No completed workouts yet.",
+    "emptyFiltered": "No workouts match this filter.",
+    "loadMore": "Load More",
+    "loading": "Loading...",
+    "allLoaded": "All workouts loaded.",
+    "sets": "{count, plural, =0 {no sets} one {# set} other {# sets}}",
+    "cardioOnly": "Cardio",
+    "freeWorkout": "Free Workout",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{count} days ago"
+  },
+  "workoutDetail": {
+    "title": "Workout Detail",
+    "splitLabel": "Program Day",
+    "noSplitDay": "No program",
+    "durationLabel": "Duration",
+    "bodyWeightLabel": "Body Weight",
+    "exercisesTitle": "Exercises",
+    "noExercises": "No exercises in this workout.",
+    "cardioTitle": "Cardio",
+    "noCardio": "No cardio in this workout.",
+    "notesLabel": "Workout Notes",
+    "totalVolume": "Total Volume",
+    "workingSets": "Working Sets",
+    "prBadge": "PR",
+    "deleteTitle": "Delete",
+    "deleteConfirmTitle": "Are you sure you want to delete this workout?",
+    "deleteConfirmBody": "This cannot be undone. All set and cardio data will be deleted.",
+    "deleteConfirm": "Yes, Delete",
+    "setNumber": "#{n}",
+    "warmup": "Warmup",
+    "rpe": "RPE"
   },
   "equipment": {
     "barbell": "Barbell",

@@ -24,6 +24,7 @@ import {
   toKg,
   type WeightUnit,
 } from "@/lib/calculations/units";
+import { Bike } from "lucide-react";
 import { cancelWorkoutAction, createWorkoutAction } from "../../actions";
 
 interface SplitDayLite {
@@ -119,36 +120,42 @@ export function StartWorkoutClient({
 
   if (!activeSplit) {
     return (
-      <div className="rounded-lg border bg-card p-6 text-center">
-        <h2 className="text-base font-semibold">{t("noActiveSplitTitle")}</h2>
-        <p className="mt-2 text-sm text-muted-foreground">{t("noActiveSplitBody")}</p>
-        <Link href="/splits" className={cn("mt-4 inline-flex", buttonVariants())}>
-          {t("goToSplits")}
-        </Link>
+      <div className="flex flex-col gap-3">
+        <div className="rounded-lg border bg-card p-6 text-center">
+          <h2 className="text-base font-semibold">{t("noActiveSplitTitle")}</h2>
+          <p className="mt-2 text-sm text-muted-foreground">{t("noActiveSplitBody")}</p>
+          <Link href="/splits" className={cn("mt-4 inline-flex", buttonVariants())}>
+            {t("goToSplits")}
+          </Link>
+        </div>
+        <CardioOnlyButton onStart={(id) => router.push(`/workout/${id}`)} pending={pending} startTransition={startTransition} />
       </div>
     );
   }
 
   return (
-    <StartForm
-      activeSplit={activeSplit}
-      lastBodyWeightKg={lastBodyWeightKg}
-      unitPreference={unitPreference}
-      onSubmit={(data) =>
-        startTransition(async () => {
-          const res = await createWorkoutAction({
-            splitDayId: data.splitDayId,
-            bodyWeightKg: data.bodyWeightKg,
-          });
-          if (res.ok && res.workoutId) {
-            router.push(`/workout/${res.workoutId}`);
-          } else {
-            toast.error(safeT(tRoot, res.errorKey ?? "workouts.errors.generic"));
-          }
-        })
-      }
-      pending={pending}
-    />
+    <div className="flex flex-col gap-4">
+      <StartForm
+        activeSplit={activeSplit}
+        lastBodyWeightKg={lastBodyWeightKg}
+        unitPreference={unitPreference}
+        onSubmit={(data) =>
+          startTransition(async () => {
+            const res = await createWorkoutAction({
+              splitDayId: data.splitDayId,
+              bodyWeightKg: data.bodyWeightKg,
+            });
+            if (res.ok && res.workoutId) {
+              router.push(`/workout/${res.workoutId}`);
+            } else {
+              toast.error(safeT(tRoot, res.errorKey ?? "workouts.errors.generic"));
+            }
+          })
+        }
+        pending={pending}
+      />
+      <CardioOnlyButton onStart={(id) => router.push(`/workout/${id}`)} pending={pending} startTransition={startTransition} />
+    </div>
   );
 }
 
@@ -306,5 +313,42 @@ function StartForm({
         </Button>
       </div>
     </div>
+  );
+}
+
+function CardioOnlyButton({
+  onStart,
+  pending,
+  startTransition,
+}: {
+  onStart: (workoutId: string) => void;
+  pending: boolean;
+  startTransition: (fn: () => Promise<void>) => void;
+}) {
+  const t = useTranslations("workouts.start");
+  const tRoot = useTranslations();
+
+  return (
+    <Button
+      variant="ghost"
+      disabled={pending}
+      className="w-full"
+      onClick={() =>
+        startTransition(async () => {
+          const res = await createWorkoutAction({
+            splitDayId: null,
+            bodyWeightKg: null,
+          });
+          if (res.ok && res.workoutId) {
+            onStart(res.workoutId);
+          } else {
+            toast.error(safeT(tRoot, res.errorKey ?? "workouts.errors.generic"));
+          }
+        })
+      }
+    >
+      <Bike className="h-4 w-4" />
+      {t("cardioOnly")}
+    </Button>
   );
 }
