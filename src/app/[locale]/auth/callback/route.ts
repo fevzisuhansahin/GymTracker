@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/types/database";
+import { getSiteUrl } from "@/lib/auth/site-url";
 
 export async function GET(
   request: NextRequest,
@@ -13,11 +14,13 @@ export async function GET(
   const errorDescription = url.searchParams.get("error_description");
 
   if (errorDescription) {
-    return NextResponse.redirect(new URL(`/${locale}/login?error=oauth`, request.url));
+    const baseUrl = await getSiteUrl();
+    return NextResponse.redirect(new URL(`/${locale}/login?error=oauth`, baseUrl));
   }
 
   const redirectPath = type === "recovery" ? `/${locale}/reset-password` : `/${locale}/dashboard`;
-  const response = NextResponse.redirect(new URL(redirectPath, request.url));
+  const siteUrl = await getSiteUrl();
+  const response = NextResponse.redirect(new URL(redirectPath, siteUrl));
 
   if (code) {
     // Cookie'leri doğrudan redirect response'una yaz; createClient() farklı bir
@@ -42,7 +45,8 @@ export async function GET(
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) {
-      return NextResponse.redirect(new URL(`/${locale}/login?error=oauth`, request.url));
+      const baseUrl = await getSiteUrl();
+      return NextResponse.redirect(new URL(`/${locale}/login?error=oauth`, baseUrl));
     }
   }
 
