@@ -33,8 +33,21 @@
     "signedInAs": "Signed in as"
   },
   "landing": {
-    "headline": "Track your workouts.",
-    "subheadline": "Coming soon.",
+    "headline": "Track your workouts,",
+    "headlineBold": "measure your progress.",
+    "subheadline": "A simple, focused workout tracker built for serious gym-goers.",
+    "logIn": "Log In",
+    "signUp": "Sign Up",
+    "feature1Title": "Workout Tracking",
+    "feature1Desc": "Log every set, rep, and weight. Track cardio too.",
+    "feature2Title": "Progress Charts",
+    "feature2Desc": "Visualize your strength gains over time.",
+    "feature2Soon": "Coming soon",
+    "feature3Title": "Cardio Support",
+    "feature3Desc": "Treadmill, bike, outdoor runs — all in one place.",
+    "feature4Title": "Leaderboards",
+    "feature4Desc": "Compare volume and PRs with friends.",
+    "feature4Soon": "Coming soon",
     "comingSoon": "Coming Soon"
   },
   "auth": {
@@ -254,6 +267,7 @@
     "editor": {
       "splitNoneLabel": "Cardio only / no program",
       "elapsed": "Elapsed",
+      "timerNotPauseable": "Timer runs continuously and cannot be paused. Total time is recorded on finish.",
       "bodyWeightShort": "Body weight",
       "addExercise": "Add Exercise",
       "addCardio": "Add Cardio",
@@ -333,6 +347,12 @@
       "notesTooLong": "Note too long."
     }
   },
+  "restTimer": {
+    "label": "Rest",
+    "resetAria": "Reset timer",
+    "adjustAria": "Adjust rest time",
+    "skipAria": "Skip rest"
+  },
   "cardio": {
     "label": "Cardio",
     "addTitle": "Add Cardio Session",
@@ -375,10 +395,13 @@
     "emptyFiltered": "No workouts match this filter.",
     "loadMore": "Load More",
     "loading": "Loading...",
+    "loadError": "Couldn't load more workouts.",
     "allLoaded": "All workouts loaded.",
     "sets": "{count, plural, =0 {no sets} one {# set} other {# sets}}",
     "cardioOnly": "Cardio",
     "freeWorkout": "Free Workout",
+    "cardioLabel": "Cardio",
+    "distanceLabel": "Distance",
     "today": "Today",
     "yesterday": "Yesterday",
     "daysAgo": "{count} days ago"

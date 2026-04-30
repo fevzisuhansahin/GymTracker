@@ -33,8 +33,21 @@
     "signedInAs": "Giriş yapıldı"
   },
   "landing": {
-    "headline": "Antrenmanlarını takip et.",
-    "subheadline": "Yakında geliyor.",
+    "headline": "Antrenmanlarını kaydet,",
+    "headlineBold": "ilerlemeni takip et.",
+    "subheadline": "Spor salonundaki her antrenman için sade ve odaklı bir takip aracı.",
+    "logIn": "Giriş Yap",
+    "signUp": "Kayıt Ol",
+    "feature1Title": "Antrenman Takibi",
+    "feature1Desc": "Her seti, tekrarı ve kiloyu kaydet. Kardiyo da dahil.",
+    "feature2Title": "İlerleme Grafikleri",
+    "feature2Desc": "Gücünün zamanla nasıl arttığını görselleştir.",
+    "feature2Soon": "Yakında",
+    "feature3Title": "Kardiyo Desteği",
+    "feature3Desc": "Koşu bandı, bisiklet, dış mekan — hepsi tek yerden.",
+    "feature4Title": "Liderlik Tablosu",
+    "feature4Desc": "Arkadaşlarınla hacim ve PR karşılaştırması yap.",
+    "feature4Soon": "Yakında",
     "comingSoon": "Çok Yakında"
   },
   "auth": {
@@ -254,6 +267,7 @@
     "editor": {
       "splitNoneLabel": "Sadece kardiyo / programsız",
       "elapsed": "Süre",
+      "timerNotPauseable": "Zamanlayıcı durmadan çalışır ve duraklatılamaz. Toplam süre antrenman bitişinde kaydedilir.",
       "bodyWeightShort": "Vücut ağırlığı",
       "addExercise": "Hareket Ekle",
       "addCardio": "Kardiyo Ekle",
@@ -333,6 +347,12 @@
       "notesTooLong": "Not çok uzun."
     }
   },
+  "restTimer": {
+    "label": "Dinlenme",
+    "resetAria": "Zamanlayıcıyı sıfırla",
+    "adjustAria": "Dinlenme süresini ayarla",
+    "skipAria": "Dinlenmeyi atla"
+  },
   "cardio": {
     "label": "Kardiyo",
     "addTitle": "Kardiyo Seansı Ekle",
@@ -375,10 +395,13 @@
     "emptyFiltered": "Bu filtrede gösterilecek antrenman yok.",
     "loadMore": "Daha Fazla Yükle",
     "loading": "Yükleniyor...",
+    "loadError": "Daha fazla antrenman yüklenemedi.",
     "allLoaded": "Tüm antrenmanlar yüklendi.",
     "sets": "{count, plural, =0 {set yok} one {# set} other {# set}}",
     "cardioOnly": "Kardiyo",
     "freeWorkout": "Serbest Antrenman",
+    "cardioLabel": "Kardiyo",
+    "distanceLabel": "Mesafe",
     "today": "Bugün",
     "yesterday": "Dün",
     "daysAgo": "{count} gün önce"

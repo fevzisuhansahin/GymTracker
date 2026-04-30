@@ -40,6 +40,7 @@ interface Props {
   flushRegistry: FlushRegistry;
   onMaterialized: (setId: string) => void; // ilk save sonrası
   onDeleted: () => void;
+  onSetComplete?: () => void; // set ✓ işaretlenince rest timer tetikler
 }
 
 type SaveState = "idle" | "saving" | "saved" | "error";
@@ -62,6 +63,7 @@ export function SetRow({
   flushRegistry,
   onMaterialized,
   onDeleted,
+  onSetComplete,
 }: Props) {
   const t = useTranslations("workouts.set");
   const tRoot = useTranslations();
@@ -268,8 +270,10 @@ export function SetRow({
           size="icon-sm"
           variant={completed ? "secondary" : "outline"}
           onClick={() => {
-            setCompleted((v) => !v);
+            const next = !completed;
+            setCompleted(next);
             void flush(); // also persist any pending input
+            if (next) onSetComplete?.();
           }}
           aria-label={t("completeAria")}
           aria-pressed={completed}

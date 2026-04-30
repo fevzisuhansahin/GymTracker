@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { RestTimer } from "@/components/workout/RestTimer";
 import { useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import {
@@ -52,7 +53,7 @@ function safeT(t: ReturnType<typeof useTranslations>, key: string): string {
 /**
  * Pending-flush registry: child SetRow component'leri pending olan
  * debounced upsert'leri buraya kaydeder. "Antrenmanı Bitir" tıklandığında
- * tüm flush handler'ları Promise.all ile beklenir (K1 onay).
+ * tüm flush handler'ları Promise.all ile beklenir.
  */
 export type FlushHandler = () => Promise<void>;
 
@@ -86,6 +87,15 @@ export function WorkoutEditor({ unitPreference, workout }: Props) {
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [cardioFormOpen, setCardioFormOpen] = useState(false);
 
+  // Rest timer state
+  const [restTimerActive, setRestTimerActive] = useState(false);
+  const [restTimerKey, setRestTimerKey] = useState(0);
+
+  const handleSetComplete = useCallback(() => {
+    setRestTimerActive(true);
+    setRestTimerKey((k) => k + 1);
+  }, []);
+
   const startedAtMs = new Date(workout.startedAt).getTime();
   const elapsed = useElapsedSeconds(startedAtMs);
 
@@ -93,9 +103,7 @@ export function WorkoutEditor({ unitPreference, workout }: Props) {
 
   function handleFinish() {
     startTransition(async () => {
-      // K1 pre-flight: önce tüm pending set upsert'lerini flush et
       await flushRegistry.flushAll();
-      // Sonra finish — actions.ts redirect'i kendi yapar
       const res = await finishWorkoutAction({
         workoutId: workout.id,
         notes: null,
@@ -104,7 +112,6 @@ export function WorkoutEditor({ unitPreference, workout }: Props) {
           Math.floor((Date.now() - startedAtMs) / 1000),
         ),
       });
-      // Buraya düşerse hata var (başarıda redirect olur)
       if (res && !res.ok) {
         toast.error(safeT(tRoot, res.errorKey ?? "workouts.errors.generic"));
       }
@@ -122,7 +129,10 @@ export function WorkoutEditor({ unitPreference, workout }: Props) {
             <h1 className="truncate text-xl font-bold tracking-tight">
               {workout.splitDayName ?? t("splitNoneLabel")}
             </h1>
-            <p className="text-xs text-muted-foreground">
+            <p
+              className="text-xs text-muted-foreground cursor-default"
+              title={t("timerNotPauseable")}
+            >
               {t("elapsed")}: {formatElapsed(elapsed)}
             </p>
           </div>
@@ -141,12 +151,15 @@ export function WorkoutEditor({ unitPreference, workout }: Props) {
           </div>
         )}
 
-        {workout.exercises.map((we) => (
+        {workout.exercises.map((we, idx) => (
           <ExerciseCard
             key={we.id}
             data={we}
             unitPreference={unitPreference}
             flushRegistry={flushRegistry}
+            canMoveUp={idx > 0}
+            canMoveDown={idx < workout.exercises.length - 1}
+            onSetComplete={handleSetComplete}
           />
         ))}
 
@@ -176,6 +189,7 @@ export function WorkoutEditor({ unitPreference, workout }: Props) {
         </div>
       </main>
 
+      {/* Fixed bottom bar: rest timer (if active) + finish button */}
       <div
         className={cn(
           "fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 backdrop-blur",
@@ -183,7 +197,14 @@ export function WorkoutEditor({ unitPreference, workout }: Props) {
           "md:relative md:inset-auto md:border-0 md:bg-transparent md:backdrop-blur-0 md:px-0 md:pb-0 md:pt-6",
         )}
       >
-        <Container className="px-0">
+        <Container className="px-0 flex flex-col gap-2">
+          {restTimerActive && (
+            <RestTimer
+              key={restTimerKey}
+              onComplete={() => setRestTimerActive(false)}
+              onSkip={() => setRestTimerActive(false)}
+            />
+          )}
           <Button
             onClick={handleFinish}
             disabled={pending}
@@ -305,7 +326,7 @@ function BodyWeightField({
 }
 
 // ---------------------------------------------------------------------------
-// useElapsedSeconds — workout timer ticker (Y2)
+// useElapsedSeconds — workout timer ticker
 // ---------------------------------------------------------------------------
 function useElapsedSeconds(startedAtMs: number): number {
   const [now, setNow] = useState<number>(() => Date.now());
@@ -323,6 +344,7 @@ function formatElapsed(seconds: number): string {
   if (h > 0) return `${h}:${pad(m)}:${pad(s)}`;
   return `${m}:${pad(s)}`;
 }
+
 function pad(n: number): string {
   return n < 10 ? `0${n}` : String(n);
 }

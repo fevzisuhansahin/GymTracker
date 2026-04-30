@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Loader2, MoreVertical, Plus, StickyNote, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Loader2, MoreVertical, Plus, StickyNote, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +28,7 @@ import { type WeightUnit } from "@/lib/calculations/units";
 import {
   removeExerciseFromWorkoutAction,
   updateExerciseNotesAction,
+  reorderExerciseAction,
 } from "../../actions";
 
 import { SetRow, type SetRowInitial } from "./SetRow";
@@ -54,6 +55,9 @@ interface Props {
   data: ExerciseCardData;
   unitPreference: WeightUnit;
   flushRegistry: FlushRegistry;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
+  onSetComplete?: () => void;
 }
 
 const PLACEHOLDER_COUNT = 3;
@@ -66,7 +70,14 @@ function safeT(t: ReturnType<typeof useTranslations>, key: string): string {
   }
 }
 
-export function ExerciseCard({ data, unitPreference, flushRegistry }: Props) {
+export function ExerciseCard({
+  data,
+  unitPreference,
+  flushRegistry,
+  canMoveUp,
+  canMoveDown,
+  onSetComplete,
+}: Props) {
   const t = useTranslations("workouts.editor");
   const tRoot = useTranslations();
   const tEquipment = useTranslations("equipment");
@@ -78,8 +89,6 @@ export function ExerciseCard({ data, unitPreference, flushRegistry }: Props) {
     Boolean(data.notes && data.notes.trim().length > 0),
   );
 
-  // Placeholder satır sayısı: mevcut DB set'lerinden eksikse 3'e tamamla.
-  // K3 onayı: auto-grow yok, kullanıcı "+ Set Ekle" ile büyütür.
   const [placeholderCount, setPlaceholderCount] = useState<number>(() =>
     Math.max(0, PLACEHOLDER_COUNT - data.sets.length),
   );
@@ -91,6 +100,28 @@ export function ExerciseCard({ data, unitPreference, flushRegistry }: Props) {
       const res = await removeExerciseFromWorkoutAction(data.id);
       if (res.ok) {
         setConfirmRemove(false);
+        router.refresh();
+      } else {
+        toast.error(safeT(tRoot, res.errorKey ?? "workouts.errors.generic"));
+      }
+    });
+  }
+
+  function handleMoveUp() {
+    startTransition(async () => {
+      const res = await reorderExerciseAction(data.id, "up");
+      if (res.ok) {
+        router.refresh();
+      } else {
+        toast.error(safeT(tRoot, res.errorKey ?? "workouts.errors.generic"));
+      }
+    });
+  }
+
+  function handleMoveDown() {
+    startTransition(async () => {
+      const res = await reorderExerciseAction(data.id, "down");
+      if (res.ok) {
         router.refresh();
       } else {
         toast.error(safeT(tRoot, res.errorKey ?? "workouts.errors.generic"));
@@ -112,6 +143,31 @@ export function ExerciseCard({ data, unitPreference, flushRegistry }: Props) {
               {tEquipment(data.exercise.equipment as never)}
             </Badge>
           )}
+        </div>
+        {/* Reorder buttons */}
+        <div className="flex items-center gap-0.5">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            onClick={handleMoveUp}
+            disabled={!canMoveUp || pending}
+            aria-label={tRoot("common.moveUp")}
+            className="h-7 w-7 text-muted-foreground"
+          >
+            <ArrowUp className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            onClick={handleMoveDown}
+            disabled={!canMoveDown || pending}
+            aria-label={tRoot("common.moveDown")}
+            className="h-7 w-7 text-muted-foreground"
+          >
+            <ArrowDown className="h-3.5 w-3.5" />
+          </Button>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger
@@ -164,6 +220,7 @@ export function ExerciseCard({ data, unitPreference, flushRegistry }: Props) {
             initial={s}
             unitPreference={unitPreference}
             flushRegistry={flushRegistry}
+            onSetComplete={onSetComplete}
             onMaterialized={() => {
               // already-saved row, nothing to do
             }}
@@ -180,13 +237,11 @@ export function ExerciseCard({ data, unitPreference, flushRegistry }: Props) {
               initial={null}
               unitPreference={unitPreference}
               flushRegistry={flushRegistry}
+              onSetComplete={onSetComplete}
               onMaterialized={() => {
-                // first save: refresh the server tree so this row gets a real id
-                // and the placeholder slot collapses on next render.
                 router.refresh();
               }}
               onDeleted={() => {
-                // placeholder dismissed without ever saving
                 setPlaceholderCount((c) => Math.max(0, c - 1));
               }}
             />

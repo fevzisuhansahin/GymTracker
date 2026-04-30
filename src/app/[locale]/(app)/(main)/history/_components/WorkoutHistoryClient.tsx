@@ -117,9 +117,9 @@ function WorkoutCard({ item }: { item: WorkoutHistoryItem }) {
         )}
         {item.hasCardio && (
           <>
-            <Metric label="Kardiyo" value={formatCardioTime(item.cardioTotalSeconds)} />
+            <Metric label={t("cardioLabel")} value={formatCardioTime(item.cardioTotalSeconds)} />
             {item.cardioTotalDistanceKm > 0 && (
-              <Metric label="Mesafe" value={`${item.cardioTotalDistanceKm.toFixed(2)} km`} />
+              <Metric label={t("distanceLabel")} value={`${item.cardioTotalDistanceKm.toFixed(2)} km`} />
             )}
           </>
         )}
@@ -177,7 +177,7 @@ export function WorkoutHistoryClient({ initialItems, pageSize, hasMore: initialH
     startTransition(async () => {
       const res = await getWorkoutHistoryAction(items.length, pageSize);
       if (!res.ok || !res.items) {
-        toast.error(t("filterAll"));
+        toast.error(t("loadError"));
         return;
       }
       setItems((prev) => [...prev, ...res.items!]);

@@ -701,6 +701,65 @@ export async function deleteCardioSessionAction(
 }
 
 // ---------------------------------------------------------------------------
+// reorderExerciseAction — order_index swap ile hareket sırası değiştir.
+// ---------------------------------------------------------------------------
+export async function reorderExerciseAction(
+  workoutExerciseId: string,
+  direction: "up" | "down",
+): Promise<{ ok: boolean; errorKey?: string }> {
+  const auth = await requireUserId();
+  if ("errorKey" in auth) return { ok: false, errorKey: auth.errorKey };
+
+  const ownership = await assertWorkoutExerciseOwner(workoutExerciseId, auth.userId);
+  if (!ownership.ok) return { ok: false, errorKey: ownership.errorKey };
+
+  const supabase = await createClient();
+
+  // Tüm workout_exercises'i sıralı çek
+  const { data: allRows, error: fetchErr } = await supabase
+    .from("workout_exercises")
+    .select("id, order_index")
+    .eq("workout_id", ownership.workoutId)
+    .order("order_index", { ascending: true });
+
+  if (fetchErr || !allRows) {
+    console.error("reorderExerciseAction (fetch):", fetchErr);
+    return { ok: false, errorKey: "workouts.errors.generic" };
+  }
+
+  const idx = allRows.findIndex((r) => r.id === workoutExerciseId);
+  if (idx === -1) return { ok: false, errorKey: "workouts.errors.notFound" };
+
+  const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+  if (swapIdx < 0 || swapIdx >= allRows.length) {
+    return { ok: true }; // already at boundary, no-op
+  }
+
+  const current = allRows[idx];
+  const neighbor = allRows[swapIdx];
+
+  if (!current || !neighbor) return { ok: true }; // boundary guard
+
+  // Swap order_indexes
+  const { error: e1 } = await supabase
+    .from("workout_exercises")
+    .update({ order_index: neighbor.order_index })
+    .eq("id", current.id);
+  const { error: e2 } = await supabase
+    .from("workout_exercises")
+    .update({ order_index: current.order_index })
+    .eq("id", neighbor.id);
+
+  if (e1 || e2) {
+    console.error("reorderExerciseAction (swap):", e1 ?? e2);
+    return { ok: false, errorKey: "workouts.errors.generic" };
+  }
+
+  revalidatePath(`/workout/${ownership.workoutId}`);
+  return { ok: true };
+}
+
+// ---------------------------------------------------------------------------
 // deleteWorkoutAction — ownership check + DELETE (CASCADE). Geçmiş detaydan çağrılır.
 // ---------------------------------------------------------------------------
 export async function deleteWorkoutAction(
