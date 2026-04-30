@@ -97,6 +97,7 @@ export async function getRecentWorkouts(
     WorkoutRow & {
       split_day: Pick<SplitDayRow, "id" | "name"> | null;
       exercises: Array<{ sets: Array<Pick<SetRow, "weight" | "reps" | "is_warmup">> }>;
+      cardio_sessions: Array<{ id: string }>;
     }
   >
 > {
@@ -109,7 +110,8 @@ export async function getRecentWorkouts(
       split_day:split_days(id, name),
       exercises:workout_exercises(
         sets(weight, reps, is_warmup)
-      )
+      ),
+      cardio_sessions(id)
     `,
     )
     .eq("user_id", userId)
@@ -127,6 +129,7 @@ export async function getRecentWorkouts(
     ...row,
     split_day: row.split_day ?? null,
     exercises: row.exercises ?? [],
+    cardio_sessions: (row.cardio_sessions ?? []) as Array<{ id: string }>,
   })) as Awaited<ReturnType<typeof getRecentWorkouts>>;
 }
 

@@ -164,6 +164,8 @@
     "recentTitle": "Recent Workouts",
     "recentEmpty": "No completed workouts yet.",
     "viewSplits": "All Programs",
+    "cardioWorkout": "Cardio",
+    "freeWorkout": "Free Workout",
     "stats": {
       "sets": "{count, plural, =0 {no sets} one {# set} other {# sets}}",
       "volume": "Volume"

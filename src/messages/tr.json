@@ -164,6 +164,8 @@
     "recentTitle": "Son Antrenmanlar",
     "recentEmpty": "Henüz tamamlanmış antrenmanın yok.",
     "viewSplits": "Tüm Programlar",
+    "cardioWorkout": "Kardiyo",
+    "freeWorkout": "Serbest Antrenman",
     "stats": {
       "sets": "{count, plural, =0 {set yok} one {# set} other {# set}}",
       "volume": "Volume"

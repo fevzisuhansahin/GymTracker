@@ -53,6 +53,7 @@ export default async function DashboardPage({ params }: PageProps) {
             id: w.id,
             date: w.date,
             splitDayName: w.split_day?.name ?? null,
+            hasCardio: (w.cardio_sessions ?? []).length > 0,
             volumeKg: calculateWorkoutVolume(exForCalc),
             workingSets: countWorkingSets(exForCalc),
           };
@@ -66,6 +67,7 @@ interface RecentWorkoutCard {
   id: string;
   date: string;
   splitDayName: string | null;
+  hasCardio: boolean;
   volumeKg: number;
   workingSets: number;
 }
@@ -207,7 +209,7 @@ function RecentWorkoutsSection({
             >
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">
-                  {w.splitDayName ?? "—"}
+                  {w.splitDayName ?? (w.hasCardio ? t("cardioWorkout") : t("freeWorkout"))}
                 </p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
                   {fmt.dateTime(new Date(w.date), {
