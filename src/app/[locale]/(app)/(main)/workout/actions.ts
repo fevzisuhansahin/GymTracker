@@ -740,18 +740,48 @@ export async function reorderExerciseAction(
 
   if (!current || !neighbor) return { ok: true }; // boundary guard
 
-  // Swap order_indexes
+  // 3-step swap via a temporary negative order_index to avoid
+  // transient unique-constraint violations on (workout_id, order_index).
+  //
+  // Direct A↔B swap fails if the column has a unique constraint:
+  //   UPDATE current → B  (now current=B, neighbor=B → DUPLICATE → 23505)
+  //   UPDATE neighbor → A (never reached)
+  //
+  // Safe order:
+  //   1. current  → temp (negative, never collides with real values)
+  //   2. neighbor → currentOldIdx
+  //   3. current  → neighborOldIdx
+  const tempIndex = -(current.order_index + neighbor.order_index + 1);
+
   const { error: e1 } = await supabase
     .from("workout_exercises")
-    .update({ order_index: neighbor.order_index })
+    .update({ order_index: tempIndex })
     .eq("id", current.id);
+  if (e1) {
+    console.error("reorderExerciseAction (step1 temp):", e1);
+    return { ok: false, errorKey: "workouts.errors.generic" };
+  }
+
   const { error: e2 } = await supabase
     .from("workout_exercises")
     .update({ order_index: current.order_index })
     .eq("id", neighbor.id);
+  if (e2) {
+    console.error("reorderExerciseAction (step2 neighbor):", e2);
+    // Attempt rollback: restore current's original order_index
+    await supabase
+      .from("workout_exercises")
+      .update({ order_index: current.order_index })
+      .eq("id", current.id);
+    return { ok: false, errorKey: "workouts.errors.generic" };
+  }
 
-  if (e1 || e2) {
-    console.error("reorderExerciseAction (swap):", e1 ?? e2);
+  const { error: e3 } = await supabase
+    .from("workout_exercises")
+    .update({ order_index: neighbor.order_index })
+    .eq("id", current.id);
+  if (e3) {
+    console.error("reorderExerciseAction (step3 current):", e3);
     return { ok: false, errorKey: "workouts.errors.generic" };
   }
 
