@@ -474,6 +474,15 @@
     "improvement": "+{percent}% from previous",
     "noRecords": "No personal records yet."
   },
+  "bodyDiagram": {
+    "title": "Muscles Worked",
+    "noActivations": "Cardio workout",
+    "front": "Front",
+    "back": "Back",
+    "hint": "Tap a muscle for details",
+    "secondary": "secondary",
+    "inactive": "not worked"
+  },
   "muscles": {
     "chest": "Chest",
     "lats": "Lats",

@@ -11,6 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { formatWeight, type WeightUnit } from "@/lib/calculations/units";
+import type { MuscleActivation } from "@/lib/calculations/muscle-activation";
+import { BodyDiagram } from "@/components/workout/BodyDiagram";
 import { updateWorkoutNotesAction } from "../../../actions";
 
 interface PRRow {
@@ -29,6 +31,7 @@ interface Props {
   initialNotes: string;
   cardioTotalSeconds: number;
   cardioTotalDistanceKm: number;
+  muscleActivations: ReadonlyArray<MuscleActivation>;
 }
 
 type SaveState = "idle" | "saving" | "saved" | "error";
@@ -60,9 +63,11 @@ export function SummaryClient({
   initialNotes,
   cardioTotalSeconds,
   cardioTotalDistanceKm,
+  muscleActivations,
 }: Props) {
   const t = useTranslations("workouts.summary");
   const tCardio = useTranslations("cardio");
+  const tBody = useTranslations("bodyDiagram");
 
   return (
     <div className="flex flex-col gap-6">
@@ -121,6 +126,17 @@ export function SummaryClient({
           </ul>
         )}
       </section>
+
+      {muscleActivations.length > 0 && (
+        <section>
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            {tBody("title")}
+          </h2>
+          <div className="rounded-lg border bg-card p-3">
+            <BodyDiagram activations={muscleActivations} />
+          </div>
+        </section>
+      )}
 
       <NotesSection workoutId={workoutId} initial={initialNotes} />
 

@@ -9,6 +9,7 @@ import {
   calculateWorkoutVolume,
   countWorkingSets,
 } from "@/lib/calculations/volume";
+import { calculateMuscleActivations } from "@/lib/calculations/muscle-activation";
 
 import { SummaryClient } from "./_components/SummaryClient";
 
@@ -73,6 +74,20 @@ export default async function SummaryPage({ params }: PageProps) {
     })),
   );
 
+  const muscleActivations = calculateMuscleActivations(
+    workout.exercises.map((we) => ({
+      exercise: {
+        primary_muscle: we.exercise.primary_muscle,
+        secondary_muscles: we.exercise.secondary_muscles ?? [],
+      },
+      sets: we.sets.map((s) => ({
+        weight: s.weight,
+        reps: s.reps,
+        is_warmup: s.is_warmup,
+      })),
+    })),
+  );
+
   const cardioTotalSeconds = workout.cardioSessions.reduce(
     (sum, cs) => sum + cs.duration_seconds,
     0,
@@ -94,6 +109,7 @@ export default async function SummaryPage({ params }: PageProps) {
         initialNotes={workout.notes ?? ""}
         cardioTotalSeconds={cardioTotalSeconds}
         cardioTotalDistanceKm={cardioTotalDistanceKm}
+        muscleActivations={muscleActivations}
       />
     </Container>
   );

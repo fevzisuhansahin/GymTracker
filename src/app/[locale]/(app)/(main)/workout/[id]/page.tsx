@@ -9,6 +9,7 @@ import {
   calculateWorkoutVolume,
   countWorkingSets,
 } from "@/lib/calculations/volume";
+import { calculateMuscleActivations } from "@/lib/calculations/muscle-activation";
 
 import { WorkoutEditor } from "./_components/WorkoutEditor";
 import { WorkoutDetail, type WorkoutDetailData } from "./_components/WorkoutDetail";
@@ -122,6 +123,20 @@ export default async function WorkoutPage({ params }: PageProps) {
     })),
   );
 
+  const muscleActivations = calculateMuscleActivations(
+    workout.exercises.map((we) => ({
+      exercise: {
+        primary_muscle: we.exercise.primary_muscle,
+        secondary_muscles: we.exercise.secondary_muscles ?? [],
+      },
+      sets: we.sets.map((s) => ({
+        weight: s.weight,
+        reps: s.reps,
+        is_warmup: s.is_warmup,
+      })),
+    })),
+  );
+
   const detailData: WorkoutDetailData = {
     id: workout.id,
     date: workout.date,
@@ -159,6 +174,7 @@ export default async function WorkoutPage({ params }: PageProps) {
     prs,
     totalVolumeKg,
     workingSetCount,
+    muscleActivations,
   };
 
   return (

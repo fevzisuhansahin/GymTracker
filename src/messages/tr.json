@@ -474,6 +474,15 @@
     "improvement": "Öncekine göre +{percent}%",
     "noRecords": "Henüz kişisel rekor yok."
   },
+  "bodyDiagram": {
+    "title": "Çalışan Kaslar",
+    "noActivations": "Kardiyo antrenmanı",
+    "front": "Ön",
+    "back": "Arka",
+    "hint": "Detay için bir kasa dokun",
+    "secondary": "yardımcı",
+    "inactive": "çalışmadı"
+  },
   "muscles": {
     "chest": "Göğüs",
     "lats": "Kanatlar",

@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { formatWeight, type WeightUnit } from "@/lib/calculations/units";
+import type { MuscleActivation } from "@/lib/calculations/muscle-activation";
+import { BodyDiagram } from "@/components/workout/BodyDiagram";
 import { formatCardioTime } from "./CardioSessionCard";
 import { deleteWorkoutAction } from "../../actions";
 
@@ -73,6 +75,7 @@ export interface WorkoutDetailData {
   prs: PRData[];
   totalVolumeKg: number;
   workingSetCount: number;
+  muscleActivations: ReadonlyArray<MuscleActivation>;
 }
 
 // ---------------------------------------------------------------------------
@@ -108,6 +111,7 @@ export function WorkoutDetail({ data, unitPreference }: Props) {
   const tRoot = useTranslations();
   const tCardio = useTranslations("cardio");
   const tEquip = useTranslations("equipment");
+  const tBody = useTranslations("bodyDiagram");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [pending, startTransition] = useTransition();
 
@@ -201,6 +205,16 @@ export function WorkoutDetail({ data, unitPreference }: Props) {
               </li>
             ))}
           </ul>
+        </section>
+      )}
+
+      {/* Muscles worked */}
+      {data.muscleActivations.length > 0 && (
+        <section>
+          <SectionTitle icon={null} title={tBody("title")} />
+          <div className="mt-2 rounded-lg border bg-card p-3">
+            <BodyDiagram activations={data.muscleActivations} />
+          </div>
         </section>
       )}
 
