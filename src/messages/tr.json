@@ -26,7 +26,8 @@
     "settings": "Ayarlar",
     "profile": "Profil",
     "newWorkout": "Yeni Antrenman",
-    "newWorkoutShort": "Antrenman"
+    "newWorkoutShort": "Antrenman",
+    "leaderboard": "Liderlik"
   },
   "header": {
     "logout": "Çıkış Yap",
@@ -496,6 +497,85 @@
     "hint": "Detay için bir kasa dokun",
     "secondary": "yardımcı",
     "inactive": "çalışmadı"
+  },
+  "profile": {
+    "notFound": "Profil bulunamadı.",
+    "privateProfile": "Bu profil gizli.",
+    "privateProfileOwner": "Profilin şu an gizli. Herkesle paylaşmak istersen ayarlardan değiştirebilirsin.",
+    "settingsLink": "Ayarlara Git",
+    "memberSince": "Üye: {date}",
+    "stats": {
+      "workouts": "{count} antrenman",
+      "volume": "{value} kg toplam",
+      "streak": "{count} günlük seri"
+    },
+    "bigThreeTitle": "Güç Üçlüsü (Tahmini 1TM)",
+    "bigThreeEmpty": "Henüz Squat, Bench Press veya Deadlift PR'ı yok.",
+    "recentTitle": "Son Antrenmanlar",
+    "recentEmpty": "Henüz tamamlanmış antrenman yok.",
+    "cardioWorkout": "Kardiyo",
+    "freeWorkout": "Serbest"
+  },
+  "leaderboard": {
+    "title": "Liderlik Tablosu",
+    "subtitle": "Arkadaşlarınla hacim ve güç karşılaştırması.",
+    "tabs": {
+      "volume": "Haftalık Hacim",
+      "streak": "Seri",
+      "bigThree": "Güç Üçlüsü"
+    },
+    "empty": "Henüz yeterli veri yok.",
+    "youLabel": "sen",
+    "kgUnit": "kg",
+    "daysUnit": "gün"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "profile": {
+      "title": "Profil Ayarları",
+      "displayName": "Görünen Ad",
+      "username": "Kullanıcı Adı",
+      "usernameHint": "3-20 karakter. Küçük harf, rakam ve _ kullanabilirsin.",
+      "avatarUrl": "Avatar URL",
+      "avatarUrlHint": "Profil fotoğrafı için URL (opsiyonel)",
+      "visibility": "Profil Görünürlüğü",
+      "public": "Herkese Açık",
+      "publicDesc": "Arkadaşların profilini ve istatistiklerini görebilir.",
+      "private": "Gizli",
+      "privateDesc": "Sadece sen görürsün.",
+      "save": "Kaydet",
+      "saving": "Kaydediliyor..."
+    },
+    "preferences": {
+      "title": "Tercihler",
+      "unit": "Birim",
+      "language": "Dil",
+      "theme": "Tema",
+      "themeLight": "Açık",
+      "themeDark": "Koyu",
+      "themeSystem": "Sistem"
+    },
+    "account": {
+      "title": "Hesap",
+      "export": "Verilerimi İndir",
+      "exportHint": "Tüm antrenman verilerini JSON formatında indir.",
+      "exporting": "Hazırlanıyor...",
+      "delete": "Hesabımı Sil",
+      "deleteHint": "Bu işlem geri alınamaz. Tüm veriler silinir.",
+      "deleteConfirmTitle": "Hesabı silmek istediğinden emin misin?",
+      "deleteConfirmBody": "Bu işlem geri alınamaz. Tüm antrenman, set ve kişisel rekor verilerin kalıcı olarak silinir.",
+      "deleteConfirm": "Evet, Hesabımı Sil",
+      "deleting": "Siliniyor..."
+    },
+    "success": {
+      "profileUpdated": "Profil güncellendi.",
+      "preferencesUpdated": "Tercihler güncellendi."
+    },
+    "errors": {
+      "usernameTaken": "Bu kullanıcı adı kullanımda.",
+      "displayNameRequired": "Görünen ad gerekli.",
+      "generic": "Bir şeyler ters gitti."
+    }
   },
   "muscles": {
     "chest": "Göğüs",

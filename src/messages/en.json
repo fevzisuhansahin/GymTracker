@@ -26,7 +26,8 @@
     "settings": "Settings",
     "profile": "Profile",
     "newWorkout": "New Workout",
-    "newWorkoutShort": "Workout"
+    "newWorkoutShort": "Workout",
+    "leaderboard": "Leaderboard"
   },
   "header": {
     "logout": "Log out",
@@ -487,6 +488,85 @@
     "totalCount": "{count, plural, =0 {no records} one {# record} other {# records}}",
     "totalImprovement": "+{amount} since first PR",
     "firstPR": "First record set!"
+  },
+  "profile": {
+    "notFound": "Profile not found.",
+    "privateProfile": "This profile is private.",
+    "privateProfileOwner": "Your profile is currently private. Change it in settings to share with others.",
+    "settingsLink": "Go to Settings",
+    "memberSince": "Member since {date}",
+    "stats": {
+      "workouts": "{count} workouts",
+      "volume": "{value} kg total",
+      "streak": "{count}-day streak"
+    },
+    "bigThreeTitle": "Big Three (Est. 1RM)",
+    "bigThreeEmpty": "No Squat, Bench Press, or Deadlift PRs yet.",
+    "recentTitle": "Recent Workouts",
+    "recentEmpty": "No completed workouts yet.",
+    "cardioWorkout": "Cardio",
+    "freeWorkout": "Free"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "subtitle": "Compare volume and strength with friends.",
+    "tabs": {
+      "volume": "Weekly Volume",
+      "streak": "Streak",
+      "bigThree": "Big Three"
+    },
+    "empty": "Not enough data yet.",
+    "youLabel": "you",
+    "kgUnit": "kg",
+    "daysUnit": "days"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": {
+      "title": "Profile",
+      "displayName": "Display Name",
+      "username": "Username",
+      "usernameHint": "3-20 characters. Lowercase letters, numbers, and _ only.",
+      "avatarUrl": "Avatar URL",
+      "avatarUrlHint": "URL for profile picture (optional)",
+      "visibility": "Profile Visibility",
+      "public": "Public",
+      "publicDesc": "Friends can see your profile and stats.",
+      "private": "Private",
+      "privateDesc": "Only you can see your profile.",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "preferences": {
+      "title": "Preferences",
+      "unit": "Unit",
+      "language": "Language",
+      "theme": "Theme",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "themeSystem": "System"
+    },
+    "account": {
+      "title": "Account",
+      "export": "Export My Data",
+      "exportHint": "Download all your workout data in JSON format.",
+      "exporting": "Preparing...",
+      "delete": "Delete My Account",
+      "deleteHint": "This is irreversible. All your data will be deleted.",
+      "deleteConfirmTitle": "Are you sure you want to delete your account?",
+      "deleteConfirmBody": "This cannot be undone. All your workouts, sets, and personal records will be permanently deleted.",
+      "deleteConfirm": "Yes, Delete My Account",
+      "deleting": "Deleting..."
+    },
+    "success": {
+      "profileUpdated": "Profile updated.",
+      "preferencesUpdated": "Preferences updated."
+    },
+    "errors": {
+      "usernameTaken": "This username is taken.",
+      "displayNameRequired": "Display name is required.",
+      "generic": "Something went wrong."
+    }
   },
   "bodyDiagram": {
     "title": "Muscles Worked",
