@@ -10,7 +10,13 @@ import { cn } from "@/lib/utils";
 import { formatWeight, type WeightUnit } from "@/lib/calculations/units";
 import { calculateWorkoutVolume, countWorkingSets } from "@/lib/calculations/volume";
 import { getActiveSplit } from "@/lib/db/splits";
-import { getActiveWorkout, getRecentWorkouts } from "@/lib/db/workouts";
+import {
+  getActiveWorkout,
+  getRecentWorkouts,
+  getWeeklyVolume,
+  getMonthlyWorkoutCount,
+  getCurrentStreak,
+} from "@/lib/db/workouts";
 import { getCurrentUserWithProfile } from "@/lib/supabase/queries/profile";
 
 interface PageProps {
@@ -26,11 +32,15 @@ export default async function DashboardPage({ params }: PageProps) {
     return null;
   }
 
-  const [active, split, recents] = await Promise.all([
-    getActiveWorkout(session.userId),
-    getActiveSplit(session.userId),
-    getRecentWorkouts(session.userId, 3),
-  ]);
+  const [active, split, recents, weeklyVolume, monthlyCount, streak] =
+    await Promise.all([
+      getActiveWorkout(session.userId),
+      getActiveSplit(session.userId),
+      getRecentWorkouts(session.userId, 3),
+      getWeeklyVolume(session.userId),
+      getMonthlyWorkoutCount(session.userId),
+      getCurrentStreak(session.userId),
+    ]);
 
   const unit: WeightUnit = session.profile?.unit_preference === "lb" ? "lb" : "kg";
 
@@ -41,6 +51,9 @@ export default async function DashboardPage({ params }: PageProps) {
         unit={unit}
         activeWorkoutId={active?.id ?? null}
         activeSplit={split ? { id: split.id, name: split.name } : null}
+        weeklyVolumeKg={weeklyVolume}
+        monthlyWorkoutCount={monthlyCount}
+        currentStreak={streak}
         recents={recents.map((w) => {
           const exForCalc = (w.exercises ?? []).map((e) => ({
             sets: (e.sets ?? []).map((s) => ({
@@ -77,6 +90,9 @@ interface DashboardProps {
   unit: WeightUnit;
   activeWorkoutId: string | null;
   activeSplit: { id: string; name: string } | null;
+  weeklyVolumeKg: number;
+  monthlyWorkoutCount: number;
+  currentStreak: number;
   recents: RecentWorkoutCard[];
 }
 
@@ -85,6 +101,9 @@ function DashboardContent({
   unit,
   activeWorkoutId,
   activeSplit,
+  weeklyVolumeKg,
+  monthlyWorkoutCount,
+  currentStreak,
   recents,
 }: DashboardProps) {
   const t = useTranslations("dashboard");
@@ -98,6 +117,13 @@ function DashboardContent({
           {t("welcome", { name: displayName })}
         </h1>
       </header>
+
+      <StatsGrid
+        unit={unit}
+        weeklyVolumeKg={weeklyVolumeKg}
+        monthlyWorkoutCount={monthlyWorkoutCount}
+        currentStreak={currentStreak}
+      />
 
       {activeWorkoutId ? (
         <Link
@@ -129,6 +155,72 @@ function DashboardContent({
       )}
 
       <RecentWorkoutsSection unit={unit} recents={recents} />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Stats grid
+// ---------------------------------------------------------------------------
+function StatsGrid({
+  unit,
+  weeklyVolumeKg,
+  monthlyWorkoutCount,
+  currentStreak,
+}: {
+  unit: WeightUnit;
+  weeklyVolumeKg: number;
+  monthlyWorkoutCount: number;
+  currentStreak: number;
+}) {
+  const t = useTranslations("dashboard");
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="grid grid-cols-3 gap-2">
+        <StatCard
+          label={t("weeklyVolume")}
+          value={`${formatWeight(weeklyVolumeKg, unit)}`}
+          unit={unit}
+        />
+        <StatCard
+          label={t("streak")}
+          value={String(currentStreak)}
+          unit={t("days")}
+        />
+        <StatCard
+          label={t("monthlyWorkouts")}
+          value={String(monthlyWorkoutCount)}
+          unit={t("workoutsUnit")}
+        />
+      </div>
+      <Link
+        href="/exercises/prs"
+        className="flex items-center justify-between rounded-lg border bg-card px-3 py-2.5 text-sm transition-colors hover:bg-muted/40"
+      >
+        <span className="font-medium">{t("viewAllPRs")}</span>
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      </Link>
+    </div>
+  );
+}
+
+function StatCard({
+  label,
+  value,
+  unit,
+}: {
+  label: string;
+  value: string;
+  unit: string;
+}) {
+  return (
+    <div className="rounded-lg border bg-card p-3">
+      <p className="truncate text-[10px] uppercase tracking-wide text-muted-foreground">
+        {label}
+      </p>
+      <p className="mt-1 text-lg font-bold leading-none">{value}</p>
+      <p className="mt-0.5 text-[10px] text-muted-foreground">{unit}</p>
     </div>
   );
 }

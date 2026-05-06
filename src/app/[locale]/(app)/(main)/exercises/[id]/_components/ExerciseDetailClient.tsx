@@ -6,8 +6,9 @@ import { ArrowLeft, Trophy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-import { formatWeight, type WeightUnit } from "@/lib/calculations/units";
+import { formatWeight, fromKg, type WeightUnit } from "@/lib/calculations/units";
 import { ExerciseProgressChart } from "@/components/charts/ExerciseProgressChart";
+import { PRTimelineChart } from "@/components/charts/PRTimelineChart";
 import type { ExerciseRow, ExerciseHistoryEntry } from "@/lib/db/exercises";
 import type { PRRecord } from "@/lib/db/prs";
 import type { ProgressDataPoint } from "@/lib/calculations/one-rep-max";
@@ -37,6 +38,7 @@ interface Props {
   prs: PRRecord[];
   progressData: ProgressDataPoint[];
   unitPreference: WeightUnit;
+  locale: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -48,6 +50,7 @@ export function ExerciseDetailClient({
   prs,
   progressData,
   unitPreference,
+  locale,
 }: Props) {
   const t = useTranslations("exercises");
   const tPrs = useTranslations("prs");
@@ -57,9 +60,15 @@ export function ExerciseDetailClient({
 
   const currentPR = prs.length > 0 ? prs[prs.length - 1] : null;
   const previousPR = prs.length > 1 ? prs[prs.length - 2] : null;
+  const firstPR = prs.length > 0 ? prs[0] : null;
   const improvement =
     currentPR && previousPR
       ? calcImprovement(currentPR.value, previousPR.value)
+      : null;
+  // İlk PR'dan bu yana toplam artış (formatlanmış)
+  const totalImprovement =
+    currentPR && firstPR && prs.length > 1
+      ? Math.round(fromKg(currentPR.value - firstPR.value, unitPreference) * 10) / 10
       : null;
 
   return (
@@ -111,28 +120,51 @@ export function ExerciseDetailClient({
         {currentPR == null ? (
           <EmptyState message={tPrs("noRecords")} />
         ) : (
-          <div className="mt-3 rounded-lg border bg-card p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                  {tPrs("currentPR")}
-                </p>
-                <p className="mt-1 text-2xl font-bold">
-                  {formatWeight(currentPR.value, unitPreference)}{" "}
-                  <span className="text-base font-normal text-muted-foreground">
-                    {unitPreference}
-                  </span>
-                </p>
+          <div className="mt-3 flex flex-col gap-3">
+            {/* Current PR card */}
+            <div className="rounded-lg border bg-card p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                    {tPrs("currentPR")}
+                  </p>
+                  <p className="mt-1 text-2xl font-bold">
+                    {formatWeight(currentPR.value, unitPreference)}{" "}
+                    <span className="text-base font-normal text-muted-foreground">
+                      {unitPreference}
+                    </span>
+                  </p>
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  {improvement != null && improvement > 0 && (
+                    <Badge variant="success" className="shrink-0">
+                      +{improvement}%
+                    </Badge>
+                  )}
+                  {totalImprovement != null && totalImprovement > 0 && (
+                    <p className="text-[10px] text-muted-foreground">
+                      {tPrs("totalImprovement", {
+                        amount: `${totalImprovement} ${unitPreference}`,
+                      })}
+                    </p>
+                  )}
+                </div>
               </div>
-              {improvement != null && improvement > 0 && (
-                <Badge variant="success" className="mt-1 shrink-0">
-                  +{improvement}%
-                </Badge>
-              )}
+              <p className="mt-1 text-xs text-muted-foreground">
+                {tPrs("achievedOn", { date: formatDate(currentPR.achievedAt) })}
+              </p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {tPrs("totalCount", { count: prs.length })}
+              </p>
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {tPrs("achievedOn", { date: formatDate(currentPR.achievedAt) })}
-            </p>
+
+            {/* PR Timeline chart */}
+            <div>
+              <p className="mb-2 text-[10px] uppercase tracking-wide text-muted-foreground">
+                {tPrs("prTimeline")}
+              </p>
+              <PRTimelineChart prs={prs} unit={unitPreference} locale={locale} />
+            </div>
           </div>
         )}
       </section>

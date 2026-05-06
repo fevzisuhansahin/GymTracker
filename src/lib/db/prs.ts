@@ -1,5 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
 export interface PRRecord {
   id: string;
   recordType: string;
@@ -33,4 +37,50 @@ export async function getPRsForExercise(
     achievedAt: r.achieved_at,
     workoutId: r.workout_id,
   }));
+}
+
+// ---------------------------------------------------------------------------
+// All PRs — en yüksek 1RM per exercise
+// ---------------------------------------------------------------------------
+export interface AllPRRecord {
+  exerciseId: string;
+  exerciseName: string;
+  value: number; // always kg
+  achievedAt: string;
+  workoutId: string | null;
+}
+
+/**
+ * Kullanıcının her hareket için en yüksek tahmini 1RM PR'ını döndürür.
+ * Supabase SDK DISTINCT ON desteklemediği için JS tarafında deduplicate yapılır:
+ * value DESC sıralı sonuçtan her exercise_id'nin ilk kaydı = max değer.
+ */
+export async function getAllPRs(userId: string): Promise<AllPRRecord[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("personal_records")
+    .select("exercise_id, value, achieved_at, workout_id, exercises!inner(name)")
+    .eq("user_id", userId)
+    .eq("record_type", "1rm")
+    .order("value", { ascending: false });
+
+  if (error) {
+    console.error("getAllPRs:", error.message);
+    return [];
+  }
+
+  const seen = new Set<string>();
+  return (data ?? [])
+    .filter((r) => {
+      if (seen.has(r.exercise_id)) return false;
+      seen.add(r.exercise_id);
+      return true;
+    })
+    .map((r) => ({
+      exerciseId: r.exercise_id,
+      exerciseName: (r.exercises as { name: string }).name,
+      value: r.value,
+      achievedAt: r.achieved_at,
+      workoutId: r.workout_id,
+    }));
 }

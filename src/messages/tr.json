@@ -182,7 +182,13 @@
     "stats": {
       "sets": "{count, plural, =0 {set yok} one {# set} other {# set}}",
       "volume": "Volume"
-    }
+    },
+    "weeklyVolume": "Haftalık Volume",
+    "streak": "Seri",
+    "monthlyWorkouts": "Bu Ay",
+    "days": "gün",
+    "workoutsUnit": "antrenman",
+    "viewAllPRs": "Tüm PR'larım"
   },
   "splits": {
     "title": "Programlar",
@@ -472,7 +478,15 @@
     "currentPR": "Güncel PR",
     "achievedOn": "{date} tarihinde kazanıldı",
     "improvement": "Öncekine göre +{percent}%",
-    "noRecords": "Henüz kişisel rekor yok."
+    "noRecords": "Henüz kişisel rekor yok.",
+    "allPRs": "Tüm Kişisel Rekorlar",
+    "bigThree": "Güç Üçlüsü",
+    "noPRs": "Henüz kişisel rekor kaydın yok.",
+    "viewAll": "Tüm PR'larım",
+    "prTimeline": "PR Geçmişi",
+    "totalCount": "{count, plural, =0 {kayıt yok} one {# rekor} other {# rekor}}",
+    "totalImprovement": "İlk PR'dan bu yana +{amount}",
+    "firstPR": "İlk rekorunu koydu!"
   },
   "bodyDiagram": {
     "title": "Çalışan Kaslar",

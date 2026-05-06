@@ -46,6 +46,7 @@ export default async function ExerciseDetailPage({ params }: PageProps) {
         prs={prs}
         progressData={progressData}
         unitPreference={unitPreference}
+        locale={locale}
       />
     </Container>
   );
