@@ -4,6 +4,17 @@ import type { MuscleGroup } from "@/lib/schemas/split";
 
 export type ExerciseRow = Database["public"]["Tables"]["exercises"]["Row"];
 
+export interface ExerciseHistoryEntry {
+  date: string;
+  workoutId: string;
+  sets: Array<{
+    weight: number;
+    reps: number;
+    rpe: number | null;
+    isWarmup: boolean;
+  }>;
+}
+
 /**
  * Sistem hareketleri (is_custom=false) + kullanıcının kendi custom'ları (created_by=auth.uid()).
  * RLS zaten filtreliyor, burada query basit.
@@ -142,4 +153,74 @@ export async function getRecentExercisesForSplitDay(
   // ranked sırasına göre map'le
   const byId = new Map((exercises ?? []).map((e) => [e.id, e] as const));
   return ranked.map((id) => byId.get(id)).filter((e): e is ExerciseRow => Boolean(e));
+}
+
+export async function getExerciseById(exerciseId: string): Promise<ExerciseRow | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("exercises")
+    .select("*")
+    .eq("id", exerciseId)
+    .maybeSingle();
+
+  if (error) {
+    console.error("getExerciseById error:", error.message);
+    return null;
+  }
+  return data;
+}
+
+export async function getExerciseHistory(
+  userId: string,
+  exerciseId: string,
+  months = 6,
+): Promise<ExerciseHistoryEntry[]> {
+  const supabase = await createClient();
+  const since = new Date();
+  since.setMonth(since.getMonth() - months);
+  const sinceDate = since.toISOString().slice(0, 10);
+
+  const { data, error } = await supabase
+    .from("workouts")
+    .select(
+      `
+      id,
+      date,
+      workout_exercises!inner(
+        exercise_id,
+        sets(weight, reps, rpe, is_warmup, set_number)
+      )
+    `,
+    )
+    .eq("user_id", userId)
+    .eq("workout_exercises.exercise_id", exerciseId)
+    .not("finished_at", "is", null)
+    .gte("date", sinceDate)
+    .order("date", { ascending: false });
+
+  if (error) {
+    console.error("getExerciseHistory error:", error.message);
+    return [];
+  }
+
+  return (data ?? []).map((row) => {
+    const weRows = (
+      row.workout_exercises as Array<{
+        exercise_id: string;
+        sets: Array<{ weight: number; reps: number; rpe: number | null; is_warmup: boolean; set_number: number }>;
+      }>
+    ).filter((we) => we.exercise_id === exerciseId);
+
+    const sets = weRows
+      .flatMap((we) => we.sets)
+      .sort((a, b) => a.set_number - b.set_number)
+      .map((s) => ({
+        weight: s.weight,
+        reps: s.reps,
+        rpe: s.rpe,
+        isWarmup: s.is_warmup,
+      }));
+
+    return { date: row.date, workoutId: row.id, sets };
+  });
 }
