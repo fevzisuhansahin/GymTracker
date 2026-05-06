@@ -438,12 +438,41 @@
     "other": "Other"
   },
   "exercises": {
+    "listTitle": "Exercises",
+    "searchPlaceholder": "Search exercises...",
+    "allMuscles": "All muscles",
+    "noResults": "No exercises found.",
+    "customBadge": "Custom",
+    "detailTitle": "Exercise Detail",
+    "progressTitle": "Progress Chart",
+    "historyTitle": "History",
+    "historyEmpty": "No history yet for this exercise.",
+    "setsCount": "{count, plural, =0 {no sets} one {# set} other {# sets}}",
     "errors": {
       "nameTooShort": "Exercise name must be at least 2 characters.",
       "nameTooLong": "Exercise name can be at most 80 characters.",
       "duplicate": "You already have an exercise with this name.",
       "generic": "Couldn't add exercise."
     }
+  },
+  "charts": {
+    "estimated1RM": "Est. 1RM",
+    "maxWeight": "Max Weight",
+    "totalVolume": "Total Volume",
+    "bestSetVolume": "Best Set",
+    "timeRange1m": "1M",
+    "timeRange3m": "3M",
+    "timeRange6m": "6M",
+    "timeRange1y": "1Y",
+    "timeRangeAll": "All",
+    "noData": "Not enough data yet."
+  },
+  "prs": {
+    "title": "Personal Records",
+    "currentPR": "Current PR",
+    "achievedOn": "Achieved on {date}",
+    "improvement": "+{percent}% from previous",
+    "noRecords": "No personal records yet."
   },
   "muscles": {
     "chest": "Chest",

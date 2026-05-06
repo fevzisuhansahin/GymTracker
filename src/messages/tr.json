@@ -438,12 +438,41 @@
     "other": "Diğer"
   },
   "exercises": {
+    "listTitle": "Hareketler",
+    "searchPlaceholder": "Hareket ara...",
+    "allMuscles": "Tümü",
+    "noResults": "Sonuç bulunamadı.",
+    "customBadge": "Özel",
+    "detailTitle": "Hareket Detayı",
+    "progressTitle": "İlerleme Grafiği",
+    "historyTitle": "Geçmiş",
+    "historyEmpty": "Bu hareket için henüz kayıt yok.",
+    "setsCount": "{count, plural, =0 {set yok} one {# set} other {# set}}",
     "errors": {
       "nameTooShort": "Hareket adı en az 2 karakter olmalı.",
       "nameTooLong": "Hareket adı en fazla 80 karakter olabilir.",
       "duplicate": "Bu isimde bir hareketin zaten var.",
       "generic": "Hareket eklenemedi."
     }
+  },
+  "charts": {
+    "estimated1RM": "Tahmini 1TM",
+    "maxWeight": "Maks Ağırlık",
+    "totalVolume": "Toplam Hacim",
+    "bestSetVolume": "En İyi Set",
+    "timeRange1m": "1A",
+    "timeRange3m": "3A",
+    "timeRange6m": "6A",
+    "timeRange1y": "1Y",
+    "timeRangeAll": "Tümü",
+    "noData": "Henüz yeterli veri yok."
+  },
+  "prs": {
+    "title": "Kişisel Rekorlar",
+    "currentPR": "Güncel PR",
+    "achievedOn": "{date} tarihinde kazanıldı",
+    "improvement": "Öncekine göre +{percent}%",
+    "noRecords": "Henüz kişisel rekor yok."
   },
   "muscles": {
     "chest": "Göğüs",

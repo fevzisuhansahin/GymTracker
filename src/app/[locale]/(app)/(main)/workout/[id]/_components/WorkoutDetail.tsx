@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Bike, Calendar, Clock, Loader2, Trash2, Trophy, Weight } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,7 @@ interface SetData {
 
 interface ExerciseData {
   id: string;
+  exerciseId: string;
   exerciseName: string;
   equipment: string | null;
   notes: string | null;
@@ -322,7 +324,12 @@ function ExerciseBlock({
     <div className="rounded-lg border bg-card p-4">
       <div className="flex items-start gap-2">
         <div className="min-w-0 flex-1">
-          <h3 className="font-semibold">{ex.exerciseName}</h3>
+          <Link
+            href={`/exercises/${ex.exerciseId}`}
+            className="font-semibold hover:underline underline-offset-2"
+          >
+            {ex.exerciseName}
+          </Link>
           {ex.equipment && (
             <Badge variant="muted" className="mt-1">
               {tEquip(ex.equipment as never)}

@@ -131,6 +131,7 @@ export default async function WorkoutPage({ params }: PageProps) {
     notes: workout.notes,
     exercises: workout.exercises.map((we) => ({
       id: we.id,
+      exerciseId: we.exercise.id,
       exerciseName: we.exercise.name,
       equipment: we.exercise.equipment,
       notes: we.notes,
