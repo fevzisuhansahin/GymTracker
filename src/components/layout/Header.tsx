@@ -20,9 +20,10 @@ import { cn } from "@/lib/utils";
 interface HeaderProps {
   displayName: string;
   username: string;
+  avatarUrl?: string | null;
 }
 
-export function Header({ displayName, username }: HeaderProps) {
+export function Header({ displayName, username, avatarUrl }: HeaderProps) {
   const t = useTranslations();
   const pathname = usePathname();
   const locale = useLocale();
@@ -32,6 +33,7 @@ export function Header({ displayName, username }: HeaderProps) {
     { href: "/dashboard", label: t("nav.dashboard") },
     { href: "/history", label: t("nav.history") },
     { href: "/splits", label: t("nav.splits") },
+    { href: "/leaderboard", label: t("nav.leaderboard") },
   ];
 
   return (
@@ -64,7 +66,18 @@ export function Header({ displayName, username }: HeaderProps) {
           <DropdownMenuTrigger
             render={
               <Button variant="ghost" size="sm" className="gap-2">
-                <User className="h-4 w-4" />
+                {avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={avatarUrl}
+                    alt={displayName}
+                    className="h-6 w-6 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                    {displayName.slice(0, 1).toUpperCase()}
+                  </div>
+                )}
                 <span className="max-w-[8rem] truncate text-sm">{displayName}</span>
               </Button>
             }

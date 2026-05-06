@@ -10,6 +10,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
       <Header
         displayName={session?.profile?.display_name ?? ""}
         username={session?.profile?.username ?? ""}
+        avatarUrl={session?.profile?.avatar_url ?? null}
       />
       <main className="flex-1 pb-20 md:pb-0">{children}</main>
       <MobileNav username={session?.profile?.username ?? ""} />
