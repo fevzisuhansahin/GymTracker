@@ -170,49 +170,80 @@ export async function getExerciseById(exerciseId: string): Promise<ExerciseRow |
   return data;
 }
 
+/**
+ * Bu hareketin geçmişini döner. İki adımlı sorgu:
+ *   1) workout_exercises.exercise_id üzerinde direkt filtre (embedded join belirsizliği yok).
+ *      RLS, kullanıcıya ait olmayan satırları otomatik hariç tutar.
+ *   2) Elde edilen workout_id'ler için workouts tablosundan metadata + filtreler.
+ * Tarih filtresi sunucuda yok — chart bileşeni zaten client-side zaman penceresi uygular.
+ */
 export async function getExerciseHistory(
   userId: string,
   exerciseId: string,
-  months = 6,
 ): Promise<ExerciseHistoryEntry[]> {
   const supabase = await createClient();
-  const since = new Date();
-  since.setMonth(since.getMonth() - months);
-  const sinceDate = since.toISOString().slice(0, 10);
 
-  const { data, error } = await supabase
-    .from("workouts")
+  // Adım 1: Bu hareketin tüm workout_exercise satırları + set'leri.
+  // exercise_id direkt kolon filtreyle sorgulanıyor — RLS user kısıtını zaten uygular.
+  const { data: weData, error: weErr } = await supabase
+    .from("workout_exercises")
     .select(
       `
       id,
-      date,
-      workout_exercises!inner(
-        exercise_id,
-        sets(weight, reps, rpe, is_warmup, set_number)
-      )
+      workout_id,
+      sets(weight, reps, rpe, is_warmup, set_number)
     `,
     )
-    .eq("user_id", userId)
-    .eq("workout_exercises.exercise_id", exerciseId)
-    .not("finished_at", "is", null)
-    .gte("date", sinceDate)
-    .order("date", { ascending: false });
+    .eq("exercise_id", exerciseId);
 
-  if (error) {
-    console.error("getExerciseHistory error:", error.message);
+  if (weErr) {
+    console.error("getExerciseHistory (workout_exercises) error:", weErr.message);
     return [];
   }
+  if (!weData || weData.length === 0) return [];
 
-  return (data ?? []).map((row) => {
-    const weRows = (
-      row.workout_exercises as Array<{
-        exercise_id: string;
-        sets: Array<{ weight: number; reps: number; rpe: number | null; is_warmup: boolean; set_number: number }>;
-      }>
-    ).filter((we) => we.exercise_id === exerciseId);
+  const workoutIds = [...new Set(weData.map((r) => r.workout_id))];
 
-    const sets = weRows
-      .flatMap((we) => we.sets)
+  // Adım 2: Workout metadata'yı çek — user_id / finished_at filtreleri
+  // doğrudan workouts tablosunda güvenilir şekilde uygulanır.
+  const { data: workoutData, error: wErr } = await supabase
+    .from("workouts")
+    .select("id, date")
+    .in("id", workoutIds)
+    .eq("user_id", userId)
+    .not("finished_at", "is", null)
+    .order("date", { ascending: false });
+
+  if (wErr) {
+    console.error("getExerciseHistory (workouts) error:", wErr.message);
+    return [];
+  }
+  if (!workoutData || workoutData.length === 0) return [];
+
+  // Geçerli workout'lara ait workout_exercise'ları grupla.
+  const validWorkoutIds = new Set(workoutData.map((w) => w.id));
+
+  type WeRow = (typeof weData)[number];
+  const weByWorkoutId = new Map<string, WeRow[]>();
+  for (const we of weData) {
+    if (!validWorkoutIds.has(we.workout_id)) continue;
+    const arr = weByWorkoutId.get(we.workout_id) ?? [];
+    arr.push(we);
+    weByWorkoutId.set(we.workout_id, arr);
+  }
+
+  return workoutData.map((workout) => {
+    const exercises = weByWorkoutId.get(workout.id) ?? [];
+    const sets = exercises
+      .flatMap((we) =>
+        (we.sets as Array<{
+          weight: number;
+          reps: number;
+          rpe: number | null;
+          is_warmup: boolean;
+          set_number: number;
+        }>),
+      )
       .sort((a, b) => a.set_number - b.set_number)
       .map((s) => ({
         weight: s.weight,
@@ -221,6 +252,6 @@ export async function getExerciseHistory(
         isWarmup: s.is_warmup,
       }));
 
-    return { date: row.date, workoutId: row.id, sets };
+    return { date: workout.date, workoutId: workout.id, sets };
   });
 }

@@ -135,8 +135,8 @@ export function ExerciseProgressChart({ data, unit }: Props) {
           onChange={setTimeRange}
           labels={timeRangeLabel}
         />
-        <div className="flex h-40 items-center justify-center rounded-lg border border-dashed bg-muted/30">
-          <p className="text-sm text-muted-foreground">{t("noData")}</p>
+        <div className="flex h-48 flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-muted/30 px-4 text-center">
+          <p className="text-sm font-medium text-muted-foreground">{t("noData")}</p>
         </div>
       </div>
     );

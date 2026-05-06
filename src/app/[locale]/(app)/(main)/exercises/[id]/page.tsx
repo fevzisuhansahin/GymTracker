@@ -28,9 +28,13 @@ export default async function ExerciseDetailPage({ params }: PageProps) {
   const unitPreference = session.profile?.unit_preference === "lb" ? "lb" : "kg";
 
   const [history, prs] = await Promise.all([
-    getExerciseHistory(session.userId, id, 6),
+    getExerciseHistory(session.userId, id),
     getPRsForExercise(session.userId, id),
   ]);
+
+  console.log(
+    `[exercise-detail] id=${id} history=${history.length} prs=${prs.length}`,
+  );
 
   const progressData = calculateProgressMetrics(history);
 
