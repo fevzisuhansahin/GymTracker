@@ -61,7 +61,7 @@ export function ExerciseSelector({
   const t = useTranslations("workouts.selector");
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="max-h-[88dvh]">
+      <SheetContent side="bottom" className="max-h-[88dvh] overflow-hidden">
         <SheetHeader>
           <SheetTitle>{t("title")}</SheetTitle>
         </SheetHeader>
@@ -152,7 +152,7 @@ function SelectorBody({
       <Tabs
         value={tab}
         onValueChange={(v) => setTab(v as typeof tab)}
-        className="flex flex-1 flex-col"
+        className="flex min-h-0 flex-1 flex-col"
       >
         <TabsList className="mx-4 mt-2 grid grid-cols-3">
           <TabsTrigger value="recommended">{t("tabRecommended")}</TabsTrigger>
