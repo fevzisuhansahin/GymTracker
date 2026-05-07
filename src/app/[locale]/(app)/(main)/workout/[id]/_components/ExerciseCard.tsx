@@ -224,7 +224,7 @@ export function ExerciseCard({
             onMaterialized={() => {
               // already-saved row, nothing to do
             }}
-            onDeleted={() => router.refresh()}
+            onDeleted={() => startTransition(() => { router.refresh(); })}
           />
         ))}
         {Array.from({ length: placeholderCount }).map((_, i) => {
@@ -243,7 +243,7 @@ export function ExerciseCard({
                 // newly-saved set (which will appear in data.sets after refresh)
                 // doesn't render alongside the surviving placeholder → no dup.
                 setPlaceholderCount((c) => Math.max(0, c - 1));
-                router.refresh();
+                startTransition(() => { router.refresh(); });
               }}
               onDeleted={() => {
                 setPlaceholderCount((c) => Math.max(0, c - 1));

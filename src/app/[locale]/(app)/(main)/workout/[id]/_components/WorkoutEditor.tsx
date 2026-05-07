@@ -230,7 +230,7 @@ export function WorkoutEditor({ unitPreference, workout, isAdmin }: Props) {
         excludeExerciseIds={workout.exercises.map((we) => we.exercise.id)}
         onAdded={() => {
           setSelectorOpen(false);
-          router.refresh();
+          startTransition(() => { router.refresh(); });
         }}
         isAdmin={isAdmin}
       />
@@ -241,7 +241,7 @@ export function WorkoutEditor({ unitPreference, workout, isAdmin }: Props) {
         onOpenChange={setCardioFormOpen}
         onSaved={() => {
           setCardioFormOpen(false);
-          router.refresh();
+          startTransition(() => { router.refresh(); });
         }}
       />
     </Container>
