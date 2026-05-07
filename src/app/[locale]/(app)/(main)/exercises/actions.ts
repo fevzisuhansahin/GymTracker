@@ -137,3 +137,78 @@ export async function createSystemExerciseAction(
   console.error("createSystemExerciseAction:", insertErr);
   return { ok: false, errorKey: "exercises.errors.generic" };
 }
+
+/**
+ * Admin-only: sistem hareketini siler (is_custom=false, created_by=null).
+ * workout_exercises veya personal_records'ta referans varsa engellenir.
+ */
+export async function deleteExerciseAction(
+  exerciseId: string,
+): Promise<ExerciseActionResult> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, errorKey: "auth.errors.notAuthenticated" };
+
+  // Defense-in-depth: admin kontrolü
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_admin")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (!profile?.is_admin) {
+    return { ok: false, errorKey: "exercises.errors.forbidden" };
+  }
+
+  // Sadece sistem hareketleri silinebilir
+  const { data: exercise } = await supabase
+    .from("exercises")
+    .select("id, is_custom")
+    .eq("id", exerciseId)
+    .maybeSingle();
+  if (!exercise) return { ok: false, errorKey: "exercises.errors.notFound" };
+  if (exercise.is_custom) {
+    return { ok: false, errorKey: "exercises.errors.forbidden" };
+  }
+
+  // workout_exercises'da kullanım kontrolü
+  const { count: weCount, error: weErr } = await supabase
+    .from("workout_exercises")
+    .select("id", { count: "exact", head: true })
+    .eq("exercise_id", exerciseId);
+  if (weErr) {
+    console.error("deleteExerciseAction usage check:", weErr);
+    return { ok: false, errorKey: "exercises.errors.generic" };
+  }
+  if (weCount && weCount > 0) {
+    return { ok: false, errorKey: "exercises.errors.exerciseInUse" };
+  }
+
+  // personal_records'ta kullanım kontrolü
+  const { count: prCount, error: prErr } = await supabase
+    .from("personal_records")
+    .select("id", { count: "exact", head: true })
+    .eq("exercise_id", exerciseId);
+  if (prErr) {
+    console.error("deleteExerciseAction pr check:", prErr);
+    return { ok: false, errorKey: "exercises.errors.generic" };
+  }
+  if (prCount && prCount > 0) {
+    return { ok: false, errorKey: "exercises.errors.exerciseInUse" };
+  }
+
+  const { error: deleteErr } = await supabase
+    .from("exercises")
+    .delete()
+    .eq("id", exerciseId)
+    .eq("is_custom", false); // ekstra güvence: asla custom silme
+  if (deleteErr) {
+    console.error("deleteExerciseAction delete:", deleteErr);
+    return { ok: false, errorKey: "exercises.errors.generic" };
+  }
+
+  revalidatePath("/exercises");
+  return { ok: true };
+}

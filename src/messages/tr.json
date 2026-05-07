@@ -461,11 +461,18 @@
     "historyTitle": "Geçmiş",
     "historyEmpty": "Bu hareket için henüz kayıt yok.",
     "setsCount": "{count, plural, =0 {set yok} one {# set} other {# set}}",
+    "deleteExercise": "Hareketi Sil",
+    "deleteConfirmTitle": "Hareketi sil",
+    "deleteConfirmDesc": "Bu hareketi silmek istediğinden emin misin? Bu işlem geri alınamaz.",
+    "deleteConfirmAction": "Evet, sil",
+    "deleteCancel": "İptal",
     "errors": {
       "nameTooShort": "Hareket adı en az 2 karakter olmalı.",
       "nameTooLong": "Hareket adı en fazla 80 karakter olabilir.",
       "duplicate": "Bu isimde bir hareket zaten var.",
       "forbidden": "Bu işlem için yetkin yok.",
+      "notFound": "Hareket bulunamadı.",
+      "exerciseInUse": "Bu hareket geçmiş antrenmanlarda kullanılıyor, silinemez.",
       "generic": "Hareket eklenemedi."
     }
   },
