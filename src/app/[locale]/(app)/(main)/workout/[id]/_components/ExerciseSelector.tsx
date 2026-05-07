@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2, Search } from "lucide-react";
 import { toast } from "sonner";
@@ -105,6 +105,15 @@ function SelectorBody({
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // "Tümü" tab'ına geçince (veya açılışta zaten "all" ise) arama input'una focus
+  useEffect(() => {
+    if (tab !== "all") return;
+    const id = setTimeout(() => { searchInputRef.current?.focus(); }, 50);
+    return () => clearTimeout(id);
+  }, [tab]);
+
   // Mount-only fetch; component remounts each time the sheet opens.
   useEffect(() => {
     void (async () => {
@@ -192,6 +201,7 @@ function SelectorBody({
             <div className="relative">
               <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
+                ref={searchInputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={t("searchPlaceholder")}

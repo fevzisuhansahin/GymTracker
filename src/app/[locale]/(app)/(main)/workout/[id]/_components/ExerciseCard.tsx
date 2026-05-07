@@ -239,11 +239,11 @@ export function ExerciseCard({
               flushRegistry={flushRegistry}
               onSetComplete={onSetComplete}
               onMaterialized={() => {
-                // Bug 1 fix: decrement placeholderCount BEFORE refresh so the
-                // newly-saved set (which will appear in data.sets after refresh)
-                // doesn't render alongside the surviving placeholder → no dup.
+                // The SetRow already holds the real setId after a successful
+                // save — future upserts and deletes work correctly without a
+                // server round-trip. Just shrink the placeholder slot; no
+                // router.refresh() needed (avoids the key-swap flicker).
                 setPlaceholderCount((c) => Math.max(0, c - 1));
-                startTransition(() => { router.refresh(); });
               }}
               onDeleted={() => {
                 setPlaceholderCount((c) => Math.max(0, c - 1));
