@@ -527,6 +527,10 @@ export async function upsertSetAction(input: SetUpsertInput): Promise<UpsertSetR
 
   // set_number = max(existing) + 1; gap'lere izin verilir (delete sonrası
   // renumber yapılmaz, K2 kararı).
+  // UPSERT semantics: if two concurrent flushes race to the same set_number
+  // (or a pre-fill already occupies that slot), ON CONFLICT DO UPDATE
+  // replaces the existing row instead of failing or creating a phantom set.
+  // sets(workout_exercise_id, set_number) has a UNIQUE constraint.
   const { data: existing, error: existErr } = await supabase
     .from("sets")
     .select("set_number")
@@ -540,15 +544,18 @@ export async function upsertSetAction(input: SetUpsertInput): Promise<UpsertSetR
 
   const { data: inserted, error: insErr } = await supabase
     .from("sets")
-    .insert({
-      workout_exercise_id: parsed.data.workoutExerciseId,
-      set_number: nextNum,
-      weight: parsed.data.weightKg,
-      reps: parsed.data.reps,
-      rpe: parsed.data.rpe,
-      is_warmup: parsed.data.isWarmup,
-      notes: parsed.data.notes,
-    })
+    .upsert(
+      {
+        workout_exercise_id: parsed.data.workoutExerciseId,
+        set_number: nextNum,
+        weight: parsed.data.weightKg,
+        reps: parsed.data.reps,
+        rpe: parsed.data.rpe,
+        is_warmup: parsed.data.isWarmup,
+        notes: parsed.data.notes,
+      },
+      { onConflict: "workout_exercise_id,set_number" },
+    )
     .select("id, set_number")
     .maybeSingle();
 
