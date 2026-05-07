@@ -454,6 +454,8 @@
     "allMuscles": "All muscles",
     "noResults": "No exercises found.",
     "customBadge": "Custom",
+    "addExerciseButton": "Add Exercise",
+    "adminSheetTitle": "Add System Exercise",
     "detailTitle": "Exercise Detail",
     "progressTitle": "Progress Chart",
     "historyTitle": "History",
@@ -462,7 +464,8 @@
     "errors": {
       "nameTooShort": "Exercise name must be at least 2 characters.",
       "nameTooLong": "Exercise name can be at most 80 characters.",
-      "duplicate": "You already have an exercise with this name.",
+      "duplicate": "An exercise with this name already exists.",
+      "forbidden": "You don't have permission for this action.",
       "generic": "Couldn't add exercise."
     }
   },

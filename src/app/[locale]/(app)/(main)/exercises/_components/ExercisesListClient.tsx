@@ -2,24 +2,29 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { MUSCLE_GROUPS, type MuscleGroup } from "@/lib/schemas/split";
 import type { ExerciseRow } from "@/lib/db/exercises";
 
+import { AdminExerciseSheet } from "./AdminExerciseSheet";
+
 interface Props {
   exercises: ExerciseRow[];
+  isAdmin: boolean;
 }
 
-export function ExercisesListClient({ exercises }: Props) {
+export function ExercisesListClient({ exercises, isAdmin }: Props) {
   const t = useTranslations("exercises");
   const tMuscles = useTranslations("muscles");
   const tEquip = useTranslations("equipment");
   const [query, setQuery] = useState("");
   const [muscle, setMuscle] = useState<MuscleGroup | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const filtered = exercises.filter((ex) => {
     const matchesQuery =
@@ -31,8 +36,17 @@ export function ExercisesListClient({ exercises }: Props) {
   });
 
   return (
+    <>
     <div className="flex flex-col gap-5">
-      <h1 className="text-2xl font-bold tracking-tight">{t("listTitle")}</h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold tracking-tight">{t("listTitle")}</h1>
+        {isAdmin && (
+          <Button size="sm" onClick={() => setSheetOpen(true)}>
+            <Plus className="h-4 w-4" />
+            {t("addExerciseButton")}
+          </Button>
+        )}
+      </div>
 
       {/* Search */}
       <div className="relative">
@@ -115,5 +129,10 @@ export function ExercisesListClient({ exercises }: Props) {
         </div>
       )}
     </div>
+
+    {isAdmin && (
+      <AdminExerciseSheet open={sheetOpen} onOpenChange={setSheetOpen} />
+    )}
+    </>
   );
 }

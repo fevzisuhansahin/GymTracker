@@ -19,10 +19,11 @@ export default async function ExercisesPage({ params }: PageProps) {
   }
 
   const exercises = await getAllAvailableExercises();
+  const isAdmin = session.profile?.is_admin === true;
 
   return (
     <Container className="py-6 pb-24">
-      <ExercisesListClient exercises={exercises} />
+      <ExercisesListClient exercises={exercises} isAdmin={isAdmin} />
     </Container>
   );
 }

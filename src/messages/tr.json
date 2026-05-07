@@ -454,6 +454,8 @@
     "allMuscles": "Tümü",
     "noResults": "Sonuç bulunamadı.",
     "customBadge": "Özel",
+    "addExerciseButton": "Hareket Ekle",
+    "adminSheetTitle": "Sistem Hareketi Ekle",
     "detailTitle": "Hareket Detayı",
     "progressTitle": "İlerleme Grafiği",
     "historyTitle": "Geçmiş",
@@ -462,7 +464,8 @@
     "errors": {
       "nameTooShort": "Hareket adı en az 2 karakter olmalı.",
       "nameTooLong": "Hareket adı en fazla 80 karakter olabilir.",
-      "duplicate": "Bu isimde bir hareketin zaten var.",
+      "duplicate": "Bu isimde bir hareket zaten var.",
+      "forbidden": "Bu işlem için yetkin yok.",
       "generic": "Hareket eklenemedi."
     }
   },

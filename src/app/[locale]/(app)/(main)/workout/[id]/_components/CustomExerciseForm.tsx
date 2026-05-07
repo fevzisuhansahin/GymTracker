@@ -19,15 +19,25 @@ import {
 import {
   adminExerciseSchema,
   EQUIPMENT_TYPES,
+  type AdminExerciseInput,
   type EquipmentType,
 } from "@/lib/schemas/exercise";
 import { MUSCLE_GROUPS, type MuscleGroup } from "@/lib/schemas/split";
 import { createCustomExerciseAndAddToWorkoutAction } from "../../actions";
 
+type SubmitResult = {
+  ok: boolean;
+  errorKey?: string;
+  fieldErrors?: Record<string, string>;
+};
+
 interface Props {
-  workoutId: string;
+  /** Workout'a eklerken zorunlu; sadece egzersiz oluştururken atlanabilir. */
+  workoutId?: string;
   onCreated: () => void;
   isAdmin: boolean;
+  /** Sağlanırsa createCustomExerciseAndAddToWorkoutAction yerine bu çağrılır. */
+  submitFn?: (data: AdminExerciseInput) => Promise<SubmitResult>;
 }
 
 function safeT(t: ReturnType<typeof useTranslations>, key: string): string {
@@ -38,7 +48,12 @@ function safeT(t: ReturnType<typeof useTranslations>, key: string): string {
   }
 }
 
-export function CustomExerciseForm({ workoutId, onCreated, isAdmin }: Props) {
+export function CustomExerciseForm({
+  workoutId,
+  onCreated,
+  isAdmin,
+  submitFn,
+}: Props) {
   const t = useTranslations("workouts.selector");
   const tRoot = useTranslations();
   const tMuscles = useTranslations("muscles");
@@ -75,10 +90,12 @@ export function CustomExerciseForm({ workoutId, onCreated, isAdmin }: Props) {
     }
 
     startTransition(async () => {
-      const res = await createCustomExerciseAndAddToWorkoutAction({
-        workoutId,
-        exercise: parsed.data,
-      });
+      const res = submitFn
+        ? await submitFn(parsed.data)
+        : await createCustomExerciseAndAddToWorkoutAction({
+            workoutId: workoutId!,
+            exercise: parsed.data,
+          });
       if (res.ok) {
         onCreated();
       } else if (res.fieldErrors) {

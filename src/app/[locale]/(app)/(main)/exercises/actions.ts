@@ -3,7 +3,12 @@
 import { revalidatePath } from "next/cache";
 
 import { createClient } from "@/lib/supabase/server";
-import { customExerciseSchema, type CustomExerciseInput } from "@/lib/schemas/exercise";
+import {
+  adminExerciseSchema,
+  customExerciseSchema,
+  type AdminExerciseInput,
+  type CustomExerciseInput,
+} from "@/lib/schemas/exercise";
 
 export interface ExerciseActionResult {
   ok: boolean;
@@ -75,5 +80,60 @@ export async function createCustomExerciseAction(
   }
 
   console.error("createCustomExerciseAction:", insertErr);
+  return { ok: false, errorKey: "exercises.errors.generic" };
+}
+
+/**
+ * Admin-only: sistem hareketi oluşturur (is_custom=false, created_by=null).
+ * Workout'a ekleme yapmaz; sadece exercises tablosuna INSERT.
+ */
+export async function createSystemExerciseAction(
+  input: AdminExerciseInput,
+): Promise<ExerciseActionResult> {
+  const parsed = adminExerciseSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, fieldErrors: flattenZodErrors(parsed.error) };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, errorKey: "auth.errors.notAuthenticated" };
+
+  // Defense-in-depth: server-side admin kontrolü
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_admin")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (!profile?.is_admin) {
+    return { ok: false, errorKey: "exercises.errors.forbidden" };
+  }
+
+  const { data: inserted, error: insertErr } = await supabase
+    .from("exercises")
+    .insert({
+      name: parsed.data.name,
+      name_en: parsed.data.nameEn ?? null,
+      primary_muscle: parsed.data.primaryMuscle,
+      secondary_muscles: parsed.data.secondaryMuscles ?? [],
+      equipment: parsed.data.equipment,
+      is_custom: false,
+      created_by: null,
+    })
+    .select("id")
+    .maybeSingle();
+
+  if (inserted) {
+    revalidatePath("/exercises");
+    return { ok: true, exerciseId: inserted.id };
+  }
+
+  if (insertErr?.code === "23505") {
+    return { ok: false, errorKey: "exercises.errors.duplicate" };
+  }
+
+  console.error("createSystemExerciseAction:", insertErr);
   return { ok: false, errorKey: "exercises.errors.generic" };
 }
