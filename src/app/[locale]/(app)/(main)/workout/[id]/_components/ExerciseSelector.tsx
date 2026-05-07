@@ -40,6 +40,7 @@ interface Props {
   splitDayId: string | null;
   excludeExerciseIds: string[];
   onAdded: () => void;
+  isAdmin: boolean;
 }
 
 function safeT(t: ReturnType<typeof useTranslations>, key: string): string {
@@ -57,6 +58,7 @@ export function ExerciseSelector({
   splitDayId,
   excludeExerciseIds,
   onAdded,
+  isAdmin,
 }: Props) {
   const t = useTranslations("workouts.selector");
   return (
@@ -71,6 +73,7 @@ export function ExerciseSelector({
             splitDayId={splitDayId}
             excludeExerciseIds={excludeExerciseIds}
             onAdded={onAdded}
+            isAdmin={isAdmin}
           />
         )}
       </SheetContent>
@@ -83,6 +86,7 @@ interface BodyProps {
   splitDayId: string | null;
   excludeExerciseIds: string[];
   onAdded: () => void;
+  isAdmin: boolean;
 }
 
 function SelectorBody({
@@ -90,6 +94,7 @@ function SelectorBody({
   splitDayId,
   excludeExerciseIds,
   onAdded,
+  isAdmin,
 }: BodyProps) {
   const t = useTranslations("workouts.selector");
   const tRoot = useTranslations();
@@ -154,10 +159,17 @@ function SelectorBody({
         onValueChange={(v) => setTab(v as typeof tab)}
         className="flex min-h-0 flex-1 flex-col"
       >
-        <TabsList className="mx-4 mt-2 grid grid-cols-3">
+        <TabsList
+          className={cn(
+            "mx-4 mt-2 grid",
+            isAdmin ? "grid-cols-3" : "grid-cols-2",
+          )}
+        >
           <TabsTrigger value="recommended">{t("tabRecommended")}</TabsTrigger>
           <TabsTrigger value="all">{t("tabAll")}</TabsTrigger>
-          <TabsTrigger value="new">{t("tabNew")}</TabsTrigger>
+          {isAdmin && (
+            <TabsTrigger value="new">{t("tabNew")}</TabsTrigger>
+          )}
         </TabsList>
 
         <SheetBody className="flex-1 px-0 py-0">
@@ -200,9 +212,15 @@ function SelectorBody({
             </div>
           </TabsContent>
 
-          <TabsContent value="new" className="m-0 px-4 py-3">
-            <CustomExerciseForm workoutId={workoutId} onCreated={onAdded} />
-          </TabsContent>
+          {isAdmin && (
+            <TabsContent value="new" className="m-0 px-4 py-3">
+              <CustomExerciseForm
+                workoutId={workoutId}
+                onCreated={onAdded}
+                isAdmin={isAdmin}
+              />
+            </TabsContent>
+          )}
         </SheetBody>
       </Tabs>
 

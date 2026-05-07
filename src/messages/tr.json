@@ -316,10 +316,14 @@
       "noResults": "Sonuç bulunamadı.",
       "addCount": "{count, plural, =0 {Seç} one {1 hareketi ekle} other {# hareketi ekle}}",
       "newName": "Hareket adı",
+      "newNameTr": "Hareket adı (Türkçe)",
+      "newNameEn": "İngilizce adı",
       "newPrimary": "Birincil kas",
+      "newSecondaryMuscles": "İkincil kas grupları",
       "newEquipment": "Ekipman",
       "newSubmit": "Oluştur ve ekle",
-      "newSubmitting": "Ekleniyor..."
+      "newSubmitting": "Ekleniyor...",
+      "optional": "opsiyonel"
     },
     "exerciseLabel": "Hareket",
     "summary": {

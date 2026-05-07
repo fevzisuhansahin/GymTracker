@@ -40,6 +40,7 @@ export interface WorkoutData {
 interface Props {
   unitPreference: WeightUnit;
   workout: WorkoutData;
+  isAdmin: boolean;
 }
 
 function safeT(t: ReturnType<typeof useTranslations>, key: string): string {
@@ -79,7 +80,7 @@ function useFlushRegistry(): FlushRegistry {
   };
 }
 
-export function WorkoutEditor({ unitPreference, workout }: Props) {
+export function WorkoutEditor({ unitPreference, workout, isAdmin }: Props) {
   const t = useTranslations("workouts.editor");
   const tRoot = useTranslations();
   const router = useRouter();
@@ -231,6 +232,7 @@ export function WorkoutEditor({ unitPreference, workout }: Props) {
           setSelectorOpen(false);
           router.refresh();
         }}
+        isAdmin={isAdmin}
       />
 
       <CardioForm

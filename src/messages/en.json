@@ -316,10 +316,14 @@
       "noResults": "No results.",
       "addCount": "{count, plural, =0 {Pick} one {Add 1 exercise} other {Add # exercises}}",
       "newName": "Exercise name",
+      "newNameTr": "Exercise name (Turkish)",
+      "newNameEn": "English name",
       "newPrimary": "Primary muscle",
+      "newSecondaryMuscles": "Secondary muscle groups",
       "newEquipment": "Equipment",
       "newSubmit": "Create and add",
-      "newSubmitting": "Adding..."
+      "newSubmitting": "Adding...",
+      "optional": "optional"
     },
     "exerciseLabel": "Exercise",
     "summary": {

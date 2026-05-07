@@ -182,6 +182,7 @@ export type Database = {
           created_at: string
           display_name: string
           id: string
+          is_admin: boolean | null
           is_public: boolean
           language: string
           onboarding_completed: boolean
@@ -194,6 +195,7 @@ export type Database = {
           created_at?: string
           display_name: string
           id: string
+          is_admin?: boolean | null
           is_public?: boolean
           language?: string
           onboarding_completed?: boolean
@@ -206,6 +208,7 @@ export type Database = {
           created_at?: string
           display_name?: string
           id?: string
+          is_admin?: boolean | null
           is_public?: boolean
           language?: string
           onboarding_completed?: boolean

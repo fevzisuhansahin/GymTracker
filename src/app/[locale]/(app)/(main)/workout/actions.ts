@@ -17,7 +17,7 @@ import {
 } from "@/lib/schemas/workout";
 import type { WorkoutHistoryItem } from "@/lib/db/workouts";
 import { getWorkoutHistory } from "@/lib/db/workouts";
-import { customExerciseSchema, type CustomExerciseInput } from "@/lib/schemas/exercise";
+import { adminExerciseSchema, type AdminExerciseInput } from "@/lib/schemas/exercise";
 import { rpcFinishWorkout } from "@/lib/db/rpc";
 
 // ---------------------------------------------------------------------------
@@ -272,17 +272,18 @@ export async function addExercisesToWorkoutAction(input: {
 // ---------------------------------------------------------------------------
 // createCustomExerciseAndAddToWorkoutAction (Y4) — combined for fewer
 // roundtrips. Idempotent on UNIQUE clash.
+// Admin kullanıcılar sistem hareketi ekleyebilir (is_custom=false, created_by=null).
 // ---------------------------------------------------------------------------
 export async function createCustomExerciseAndAddToWorkoutAction(input: {
   workoutId: string;
-  exercise: CustomExerciseInput;
+  exercise: AdminExerciseInput;
 }): Promise<{
   ok: boolean;
   errorKey?: string;
   fieldErrors?: Record<string, string>;
   workoutExerciseId?: string;
 }> {
-  const parsed = customExerciseSchema.safeParse(input.exercise);
+  const parsed = adminExerciseSchema.safeParse(input.exercise);
   if (!parsed.success) {
     return { ok: false, fieldErrors: flattenZodErrors(parsed.error) };
   }
@@ -295,33 +296,76 @@ export async function createCustomExerciseAndAddToWorkoutAction(input: {
 
   const supabase = await createClient();
 
-  let exerciseId: string | null = null;
-  const { data: inserted, error: insertErr } = await supabase
-    .from("exercises")
-    .insert({
-      name: parsed.data.name,
-      primary_muscle: parsed.data.primaryMuscle,
-      equipment: parsed.data.equipment,
-      is_custom: true,
-      created_by: auth.userId,
-    })
-    .select("id")
+  // Defense-in-depth: admin kontrolü server'da da yapılır
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_admin")
+    .eq("id", auth.userId)
     .maybeSingle();
+  const isAdmin = profile?.is_admin === true;
 
-  if (inserted) {
-    exerciseId = inserted.id;
-  } else if (insertErr?.code === "23505") {
-    const { data: existing } = await supabase
+  let exerciseId: string | null = null;
+
+  if (isAdmin) {
+    // Sistem hareketi: is_custom=false, created_by=null
+    const { data: inserted, error: insertErr } = await supabase
       .from("exercises")
+      .insert({
+        name: parsed.data.name,
+        name_en: parsed.data.nameEn ?? null,
+        primary_muscle: parsed.data.primaryMuscle,
+        secondary_muscles: parsed.data.secondaryMuscles ?? [],
+        equipment: parsed.data.equipment,
+        is_custom: false,
+        created_by: null,
+      })
       .select("id")
-      .eq("name", parsed.data.name)
-      .eq("created_by", auth.userId)
       .maybeSingle();
-    if (existing) exerciseId = existing.id;
+
+    if (inserted) {
+      exerciseId = inserted.id;
+    } else if (insertErr?.code === "23505") {
+      // Aynı isimde sistem hareketi zaten var — idempotent: mevcut id'yi kullan
+      const { data: existing } = await supabase
+        .from("exercises")
+        .select("id")
+        .eq("name", parsed.data.name)
+        .is("created_by", null)
+        .maybeSingle();
+      if (existing) exerciseId = existing.id;
+    } else if (insertErr) {
+      console.error("createCustomExerciseAndAdd (admin):", insertErr);
+    }
+  } else {
+    // Normal kullanıcı: custom hareket
+    const { data: inserted, error: insertErr } = await supabase
+      .from("exercises")
+      .insert({
+        name: parsed.data.name,
+        primary_muscle: parsed.data.primaryMuscle,
+        equipment: parsed.data.equipment,
+        is_custom: true,
+        created_by: auth.userId,
+      })
+      .select("id")
+      .maybeSingle();
+
+    if (inserted) {
+      exerciseId = inserted.id;
+    } else if (insertErr?.code === "23505") {
+      const { data: existing } = await supabase
+        .from("exercises")
+        .select("id")
+        .eq("name", parsed.data.name)
+        .eq("created_by", auth.userId)
+        .maybeSingle();
+      if (existing) exerciseId = existing.id;
+    } else if (insertErr) {
+      console.error("createCustomExerciseAndAdd:", insertErr);
+    }
   }
 
   if (!exerciseId) {
-    console.error("createCustomExerciseAndAdd:", insertErr);
     return { ok: false, errorKey: "exercises.errors.generic" };
   }
 

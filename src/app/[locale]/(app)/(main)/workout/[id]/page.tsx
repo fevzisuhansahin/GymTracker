@@ -52,12 +52,14 @@ export default async function WorkoutPage({ params }: PageProps) {
   if (workout.user_id !== session.userId) notFound();
 
   const unitPreference = session.profile?.unit_preference === "lb" ? "lb" : "kg";
+  const isAdmin = session.profile?.is_admin === true;
 
   // Active workout — editor view
   if (!workout.finished_at) {
     return (
       <WorkoutEditor
         unitPreference={unitPreference}
+        isAdmin={isAdmin}
         workout={{
           id: workout.id,
           startedAt: workout.started_at,

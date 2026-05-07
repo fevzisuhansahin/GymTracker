@@ -23,3 +23,14 @@ export const customExerciseSchema = z.object({
   equipment: equipmentSchema,
 });
 export type CustomExerciseInput = z.infer<typeof customExerciseSchema>;
+
+/** Admin-only: sistem hareketi ekleme için customExerciseSchema'nın üst kümesi. */
+export const adminExerciseSchema = customExerciseSchema.extend({
+  nameEn: z
+    .string()
+    .max(80, { message: "exercises.errors.nameTooLong" })
+    .transform((v) => v.trim())
+    .optional(),
+  secondaryMuscles: z.array(muscleGroupSchema).max(5).optional(),
+});
+export type AdminExerciseInput = z.infer<typeof adminExerciseSchema>;
