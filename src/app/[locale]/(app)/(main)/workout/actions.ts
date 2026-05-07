@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getLocale } from "next-intl/server";
 
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -574,19 +575,32 @@ export async function finishWorkoutAction(
       durationSeconds: parsed.data.durationSeconds,
     });
   } catch (e) {
-    const msg = e instanceof Error ? e.message : "";
-    console.error("finishWorkoutAction:", e);
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[finishWorkoutAction] rpcFinishWorkout failed:", {
+      workoutId: parsed.data.workoutId,
+      userId: auth.userId,
+      error: msg,
+    });
     if (msg.includes("workout_not_found")) {
       return { ok: false, errorKey: "workouts.errors.notFound" };
     }
     if (msg.includes("forbidden")) {
       return { ok: false, errorKey: "workouts.errors.forbidden" };
     }
+    if (msg.includes("not_authenticated")) {
+      return { ok: false, errorKey: "auth.errors.notAuthenticated" };
+    }
     return { ok: false, errorKey: "workouts.errors.generic" };
   }
 
+  // Resolve the locale so the redirect URL is fully-qualified and the
+  // intl middleware does NOT intercept it with a second locale-prefix
+  // redirect.  Without the locale, proxy.ts returns an intlMiddleware
+  // redirect early — before updateSession() runs — which can cause a
+  // stale-token read on the subsequent request and a spurious logout.
+  const locale = await getLocale();
   revalidatePath("/dashboard");
-  redirect(`/workout/${parsed.data.workoutId}/summary`);
+  redirect(`/${locale}/workout/${parsed.data.workoutId}/summary`);
 }
 
 // ---------------------------------------------------------------------------
@@ -855,9 +869,10 @@ export async function deleteWorkoutAction(
     console.error("deleteWorkoutAction:", error);
     return { ok: false, errorKey: "workouts.errors.generic" };
   }
+  const locale = await getLocale();
   revalidatePath("/history");
   revalidatePath("/dashboard");
-  redirect("/history");
+  redirect(`/${locale}/history`);
 }
 
 // ---------------------------------------------------------------------------

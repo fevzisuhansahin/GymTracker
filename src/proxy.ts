@@ -41,12 +41,20 @@ export default async function proxy(request: NextRequest) {
   const isApi = request.nextUrl.pathname.startsWith("/api/");
 
   let response: NextResponse;
+  let isIntlRedirect = false;
+
   if (isApi) {
     response = NextResponse.next();
   } else {
     const intlResponse = intlMiddleware(request);
     if (intlResponse.headers.get("location")) {
-      return intlResponse;
+      // The intl middleware wants to add a locale prefix.  Previously we
+      // returned early here, but that skips updateSession() — meaning any
+      // token refresh that happened during the preceding Server Action never
+      // gets written into the redirect response, which can leave the browser
+      // with stale / rotated-away tokens and a spurious logout.
+      // Keep a flag so we return this redirect after session refresh.
+      isIntlRedirect = true;
     }
     response = intlResponse instanceof NextResponse ? intlResponse : NextResponse.next();
   }
@@ -55,6 +63,9 @@ export default async function proxy(request: NextRequest) {
   response.headers.set("x-pathname", request.nextUrl.pathname);
 
   const { isAuthenticated } = await updateSession(request, response);
+
+  // Return locale-redirect response now that session cookies are refreshed.
+  if (isIntlRedirect) return response;
 
   const { rest } = stripLocale(request.nextUrl.pathname);
   const locale = detectLocale(request);
