@@ -100,11 +100,14 @@ export function ExerciseCard({
   // the first save returns a real setId.  The slotKey is stable so React
   // never unmounts the row during that transition.
   const slotKeyRef = useRef(0);
+  // If the server already provided pre-filled sets (copied from the last
+  // workout), start with 0 empty slots — the user sees real data immediately.
+  // Otherwise fall back to PLACEHOLDER_COUNT empty rows.
   const [slots, setSlots] = useState<PlaceholderSlot[]>(() =>
-    Array.from({ length: Math.max(0, PLACEHOLDER_COUNT - data.sets.length) }, (_, i) => ({
-      slotKey: `s-${data.id}-${i}`,
-      materializedId: null,
-    })),
+    Array.from(
+      { length: data.sets.length > 0 ? 0 : PLACEHOLDER_COUNT },
+      (_, i) => ({ slotKey: `s-${data.id}-${i}`, materializedId: null }),
+    ),
   );
 
   // When router.refresh() brings new data.sets from the server, exclude any

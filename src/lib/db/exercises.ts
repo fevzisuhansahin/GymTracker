@@ -155,6 +155,77 @@ export async function getRecentExercisesForSplitDay(
   return ranked.map((id) => byId.get(id)).filter((e): e is ExerciseRow => Boolean(e));
 }
 
+export interface LastWorkoutSet {
+  weight: number;
+  reps: number;
+  isWarmup: boolean;
+}
+
+/**
+ * Kullanıcının bu hareketi en son tamamladığı antrenmanın set verilerini döner.
+ * Yeni antrenman eklerken default değer olarak kullanılır.
+ * RPE ve notes kopyalanmaz — sadece weight, reps, is_warmup.
+ * İlk kez yapılan harekette (geçmiş yok) null döner.
+ *
+ * İki adımlı sorgu (getExerciseHistory ile aynı pattern):
+ *   1) workout_exercises'den exercise_id filtreli satırlar + setler — RLS userId'yi garantiler.
+ *   2) workouts'tan en son finished_at IS NOT NULL olanı bul.
+ */
+export async function getLastWorkoutSetsForExercise(
+  userId: string,
+  exerciseId: string,
+): Promise<LastWorkoutSet[] | null> {
+  const supabase = await createClient();
+
+  // Adım 1: Bu harekete ait tüm workout_exercise satırları + setleri
+  const { data: weData, error: weErr } = await supabase
+    .from("workout_exercises")
+    .select("id, workout_id, sets(weight, reps, is_warmup, set_number)")
+    .eq("exercise_id", exerciseId);
+
+  if (weErr) {
+    console.error("getLastWorkoutSetsForExercise (workout_exercises) error:", weErr.message);
+    return null;
+  }
+  if (!weData || weData.length === 0) return null;
+
+  const workoutIds = [...new Set(weData.map((r) => r.workout_id))];
+
+  // Adım 2: Bu workout'lar içinde en son tamamlanmış olanı bul
+  const { data: latestWorkout, error: wErr } = await supabase
+    .from("workouts")
+    .select("id")
+    .in("id", workoutIds)
+    .eq("user_id", userId)
+    .not("finished_at", "is", null)
+    .order("date", { ascending: false })
+    .order("started_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (wErr) {
+    console.error("getLastWorkoutSetsForExercise (workouts) error:", wErr.message);
+    return null;
+  }
+  if (!latestWorkout) return null;
+
+  // Adım 3: O workout'taki hareketin setlerini set_number ASC sırala
+  const we = weData.find((r) => r.workout_id === latestWorkout.id);
+  if (!we) return null;
+
+  type SetRow = {
+    weight: number;
+    reps: number;
+    is_warmup: boolean;
+    set_number: number;
+  };
+  const sets = (we.sets as SetRow[])
+    .sort((a, b) => a.set_number - b.set_number)
+    .map((s) => ({ weight: s.weight, reps: s.reps, isWarmup: s.is_warmup }));
+
+  return sets.length > 0 ? sets : null;
+}
+
 export async function getExerciseById(exerciseId: string): Promise<ExerciseRow | null> {
   const supabase = await createClient();
   const { data, error } = await supabase

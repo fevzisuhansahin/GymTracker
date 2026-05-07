@@ -20,6 +20,7 @@ import type { WorkoutHistoryItem } from "@/lib/db/workouts";
 import { getWorkoutHistory } from "@/lib/db/workouts";
 import { adminExerciseSchema, type AdminExerciseInput } from "@/lib/schemas/exercise";
 import { rpcFinishWorkout } from "@/lib/db/rpc";
+import { getLastWorkoutSetsForExercise } from "@/lib/db/exercises";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -266,8 +267,37 @@ export async function addExercisesToWorkoutAction(input: {
     return { ok: false, errorKey: "workouts.errors.generic" };
   }
 
+  // Pre-fill sets from the most recent completed workout for each exercise.
+  // Runs in parallel; non-fatal if any lookup fails.
+  const insertedRows = inserted ?? [];
+  if (insertedRows.length > 0) {
+    const setsBatches = await Promise.all(
+      insertedRows.map(async (we, idx) => {
+        const exerciseId = input.exerciseIds[idx];
+        if (!exerciseId) return [];
+        const lastSets = await getLastWorkoutSetsForExercise(auth.userId, exerciseId);
+        if (!lastSets || lastSets.length === 0) return [];
+        return lastSets.map((s, setIdx) => ({
+          workout_exercise_id: we.id,
+          set_number: setIdx + 1,
+          weight: s.weight,
+          reps: s.reps,
+          is_warmup: s.isWarmup,
+        }));
+      }),
+    );
+    const setsToInsert = setsBatches.flat();
+    if (setsToInsert.length > 0) {
+      const { error: setsErr } = await supabase.from("sets").insert(setsToInsert);
+      if (setsErr) {
+        // Non-fatal: exercise was added, sets just won't be pre-filled.
+        console.error("addExercisesToWorkoutAction (sets prefill):", setsErr);
+      }
+    }
+  }
+
   revalidatePath(`/workout/${input.workoutId}`);
-  return { ok: true, addedIds: (inserted ?? []).map((r) => r.id) };
+  return { ok: true, addedIds: insertedRows.map((r) => r.id) };
 }
 
 // ---------------------------------------------------------------------------
