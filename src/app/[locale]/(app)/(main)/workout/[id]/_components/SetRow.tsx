@@ -97,6 +97,10 @@ export function SetRow({
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Bug 3 fix: keep a ref that always points to the latest `flush` so the
+  // debounce timer never closes over a stale version when the user types fast.
+  const flushRef = useRef<() => Promise<void>>(async () => undefined);
+
   /** Validate + persist. Used by debounce, blur, and finish pre-flight. */
   const flush = useCallback(async (): Promise<void> => {
     if (timer.current) {
@@ -177,6 +181,12 @@ export function SetRow({
     }
   }, [setId, weight, reps, rpe, isWarmup, workoutExerciseId, unitPreference, onMaterialized, tRoot]);
 
+  // Keep flushRef in sync with the latest flush after each render.
+  // Timer fires >= 400 ms later, so this effect always runs before the callback.
+  useEffect(() => {
+    flushRef.current = flush;
+  }, [flush]);
+
   // Register/unregister with the parent flush registry (K1 finish pre-flight)
   useEffect(() => {
     flushRegistry.register(flushId, flush);
@@ -186,7 +196,9 @@ export function SetRow({
   function scheduleSave() {
     setSaveState("idle");
     if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => void flush(), DEBOUNCE_MS);
+    // Bug 3 fix: use flushRef so the timer always calls the up-to-date flush,
+    // even when the user types faster than the debounce window.
+    timer.current = setTimeout(() => void flushRef.current(), DEBOUNCE_MS);
   }
 
   function handleBlur() {
@@ -272,7 +284,11 @@ export function SetRow({
           onClick={() => {
             const next = !completed;
             setCompleted(next);
-            void flush(); // also persist any pending input
+            // Bug 2 fix: ✓ only triggers the rest timer.
+            // Pending data is saved by the ongoing debounce or onBlur;
+            // calling flush() here caused placeholder duplication when the
+            // newly saved set triggered onMaterialized → router.refresh()
+            // before placeholderCount was decremented.
             if (next) onSetComplete?.();
           }}
           aria-label={t("completeAria")}
