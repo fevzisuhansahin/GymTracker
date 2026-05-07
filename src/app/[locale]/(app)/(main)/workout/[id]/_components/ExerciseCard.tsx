@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { ArrowDown, ArrowUp, Loader2, MoreVertical, Plus, StickyNote, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -62,6 +62,13 @@ interface Props {
 
 const PLACEHOLDER_COUNT = 3;
 
+interface PlaceholderSlot {
+  /** Stable React key — never changes after creation. */
+  slotKey: string;
+  /** Set once the row is persisted for the first time. */
+  materializedId: string | null;
+}
+
 function safeT(t: ReturnType<typeof useTranslations>, key: string): string {
   try {
     return t(key);
@@ -89,11 +96,26 @@ export function ExerciseCard({
     Boolean(data.notes && data.notes.trim().length > 0),
   );
 
-  const [placeholderCount, setPlaceholderCount] = useState<number>(() =>
-    Math.max(0, PLACEHOLDER_COUNT - data.sets.length),
+  // Each entry is a placeholder slot that may later be "materialized" once
+  // the first save returns a real setId.  The slotKey is stable so React
+  // never unmounts the row during that transition.
+  const slotKeyRef = useRef(0);
+  const [slots, setSlots] = useState<PlaceholderSlot[]>(() =>
+    Array.from({ length: Math.max(0, PLACEHOLDER_COUNT - data.sets.length) }, (_, i) => ({
+      slotKey: `s-${data.id}-${i}`,
+      materializedId: null,
+    })),
   );
 
-  const totalRows = data.sets.length + placeholderCount;
+  // When router.refresh() brings new data.sets from the server, exclude any
+  // slot whose materializedId is now already represented there, preventing
+  // double-rendering.  Computed inline so no setState-in-effect is needed.
+  const visibleSlots = useMemo(() => {
+    const serverIds = new Set(data.sets.map((s) => s.id));
+    return slots.filter((slot) => !slot.materializedId || !serverIds.has(slot.materializedId));
+  }, [slots, data.sets]);
+
+  const totalRows = data.sets.length + visibleSlots.length;
 
   function handleRemove() {
     startTransition(async () => {
@@ -130,7 +152,9 @@ export function ExerciseCard({
   }
 
   function addSet() {
-    setPlaceholderCount((c) => c + 1);
+    slotKeyRef.current += 1;
+    const key = `s-${data.id}-added-${slotKeyRef.current}`;
+    setSlots((s) => [...s, { slotKey: key, materializedId: null }]);
   }
 
   return (
@@ -227,26 +251,31 @@ export function ExerciseCard({
             onDeleted={() => startTransition(() => { router.refresh(); })}
           />
         ))}
-        {Array.from({ length: placeholderCount }).map((_, i) => {
+        {visibleSlots.map((slot, i) => {
           const displayIdx = data.sets.length + i + 1;
           return (
             <SetRow
-              key={`placeholder-${data.id}-${i}-${data.sets.length}`}
+              key={slot.slotKey}
               workoutExerciseId={data.id}
               displayIndex={displayIdx}
               initial={null}
               unitPreference={unitPreference}
               flushRegistry={flushRegistry}
               onSetComplete={onSetComplete}
-              onMaterialized={() => {
-                // The SetRow already holds the real setId after a successful
-                // save — future upserts and deletes work correctly without a
-                // server round-trip. Just shrink the placeholder slot; no
-                // router.refresh() needed (avoids the key-swap flicker).
-                setPlaceholderCount((c) => Math.max(0, c - 1));
+              onMaterialized={(realSetId) => {
+                // Mark this slot with the real setId so the cleanup effect
+                // can prune it after the next router.refresh().
+                // The slotKey stays the same → no unmount, no flicker.
+                setSlots((s) =>
+                  s.map((sl) =>
+                    sl.slotKey === slot.slotKey
+                      ? { ...sl, materializedId: realSetId }
+                      : sl,
+                  ),
+                );
               }}
               onDeleted={() => {
-                setPlaceholderCount((c) => Math.max(0, c - 1));
+                setSlots((s) => s.filter((sl) => sl.slotKey !== slot.slotKey));
               }}
             />
           );
