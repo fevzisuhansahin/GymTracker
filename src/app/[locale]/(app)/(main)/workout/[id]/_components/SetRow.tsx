@@ -108,16 +108,30 @@ export function SetRow({
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Bug 3 fix: keep a ref that always points to the latest `flush` so the
-  // debounce timer never closes over a stale version when the user types fast.
+  // Always points to the latest `flush` closure so the debounce timer never
+  // captures a stale version when the user types faster than the debounce window.
   const flushRef = useRef<() => Promise<void>>(async () => undefined);
+
+  // Guards against concurrent flush calls (debounce fire + onBlur arriving
+  // at the same time).  If a flush is already in-flight, a second call is a
+  // no-op — the in-flight call already holds the most-recent field values via
+  // the closure over `weight`, `reps`, etc.
+  const isFlushingRef = useRef(false);
 
   /** Validate + persist. Used by debounce, blur, and finish pre-flight. */
   const flush = useCallback(async (): Promise<void> => {
+    // Cancel any pending debounce that hasn't fired yet (e.g. flushAll on finish).
     if (timer.current) {
       clearTimeout(timer.current);
       timer.current = null;
     }
+
+    // Prevent concurrent flushes.  The root cause of the duplicate-set bug:
+    // the debounce fires and starts an async upsert; before it resolves the
+    // user blurs the input which calls flush() again — both see setId=null and
+    // both INSERT a new row.  Dropping the second call is safe because the
+    // first one was already created with the same field values.
+    if (isFlushingRef.current) return;
 
     // No-op short-circuits
     const wTrim = weight.trim();
@@ -165,30 +179,35 @@ export function SetRow({
       rpeNum = rpParsed;
     }
 
+    isFlushingRef.current = true;
     setSaveState("saving");
-    const res = await upsertSetAction({
-      setId,
-      workoutExerciseId,
-      weightKg,
-      reps: repsInt,
-      rpe: rpeNum,
-      isWarmup,
-      notes: null,
-    });
+    try {
+      const res = await upsertSetAction({
+        setId,
+        workoutExerciseId,
+        weightKg,
+        reps: repsInt,
+        rpe: rpeNum,
+        isWarmup,
+        notes: null,
+      });
 
-    if (res.ok && res.setId) {
-      lastSavedRef.current = { weight: wTrim, reps: rTrim, rpe: rpTrim, isWarmup };
-      const wasNew = setId === null;
-      setSetId(res.setId);
-      setSaveState("saved");
-      if (wasNew) onMaterialized(res.setId);
-    } else if (res.fieldErrors) {
-      const firstErr = Object.values(res.fieldErrors)[0];
-      if (firstErr) toast.error(safeT(tRoot, firstErr));
-      setSaveState("error");
-    } else {
-      toast.error(safeT(tRoot, res.errorKey ?? "workouts.errors.generic"));
-      setSaveState("error");
+      if (res.ok && res.setId) {
+        lastSavedRef.current = { weight: wTrim, reps: rTrim, rpe: rpTrim, isWarmup };
+        const wasNew = setId === null;
+        setSetId(res.setId);
+        setSaveState("saved");
+        if (wasNew) onMaterialized(res.setId);
+      } else if (res.fieldErrors) {
+        const firstErr = Object.values(res.fieldErrors)[0];
+        if (firstErr) toast.error(safeT(tRoot, firstErr));
+        setSaveState("error");
+      } else {
+        toast.error(safeT(tRoot, res.errorKey ?? "workouts.errors.generic"));
+        setSaveState("error");
+      }
+    } finally {
+      isFlushingRef.current = false;
     }
   }, [setId, weight, reps, rpe, isWarmup, workoutExerciseId, unitPreference, onMaterialized, tRoot]);
 
@@ -207,13 +226,25 @@ export function SetRow({
   function scheduleSave() {
     setSaveState("idle");
     if (timer.current) clearTimeout(timer.current);
-    // Bug 3 fix: use flushRef so the timer always calls the up-to-date flush,
-    // even when the user types faster than the debounce window.
-    timer.current = setTimeout(() => void flushRef.current(), DEBOUNCE_MS);
+    // Clear timer.current to null BEFORE invoking the callback so that a
+    // concurrent onBlur doesn't find a stale timer ID and mistake it for a
+    // still-pending debounce (clearTimeout on a fired timer is a no-op, but
+    // timer.current staying non-null was masking the real in-flight state).
+    timer.current = setTimeout(() => {
+      timer.current = null;
+      void flushRef.current();
+    }, DEBOUNCE_MS);
   }
 
   function handleBlur() {
-    // K1 onBlur: pending debounce'u bypass et, anında flush
+    // Cancel any pending debounce and flush immediately.  Explicitly cancelling
+    // here (rather than relying on flush() to do it) ensures that the debounce
+    // can never fire *after* onBlur has already started its own flush, which
+    // was the exact path that produced duplicate INSERTs.
+    if (timer.current) {
+      clearTimeout(timer.current);
+      timer.current = null;
+    }
     void flush();
   }
 
