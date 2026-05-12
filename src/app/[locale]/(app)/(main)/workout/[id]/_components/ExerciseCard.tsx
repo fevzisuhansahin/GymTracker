@@ -67,6 +67,16 @@ interface PlaceholderSlot {
   slotKey: string;
   /** Set once the row is persisted for the first time. */
   materializedId: string | null;
+  /**
+   * true  = created by the user clicking "+ Add Set" after initial mount.
+   * false = created at mount because data.sets was empty at that moment.
+   *
+   * When data.sets later becomes non-empty (pre-fill arrived via a subsequent
+   * router.refresh() during a React concurrent transition), we must suppress
+   * the initial unmaterialized slots so they don't stack on top of the real
+   * server rows and cause duplicate INSERTs.
+   */
+  isUserAdded: boolean;
 }
 
 function safeT(t: ReturnType<typeof useTranslations>, key: string): string {
@@ -106,16 +116,29 @@ export function ExerciseCard({
   const [slots, setSlots] = useState<PlaceholderSlot[]>(() =>
     Array.from(
       { length: data.sets.length > 0 ? 0 : PLACEHOLDER_COUNT },
-      (_, i) => ({ slotKey: `s-${data.id}-${i}`, materializedId: null }),
+      (_, i) => ({ slotKey: `s-${data.id}-${i}`, materializedId: null, isUserAdded: false }),
     ),
   );
 
-  // When router.refresh() brings new data.sets from the server, exclude any
-  // slot whose materializedId is now already represented there, preventing
-  // double-rendering.  Computed inline so no setState-in-effect is needed.
+  // Derive visible placeholder slots without setState-in-effect.
+  //
+  // Two pruning rules:
+  //   1. A materialized slot whose realSetId is now in data.sets has been
+  //      confirmed by the server → hide it (server row will render instead).
+  //   2. An unmaterialized slot that was created at initial mount
+  //      (isUserAdded=false) should be hidden once data.sets becomes non-empty.
+  //      This fixes the concurrent-transition race: React may render the card
+  //      briefly with data.sets=[] (creating 3 phantom slots), then re-render
+  //      with the pre-fill sets.  Without this rule those phantom slots survive
+  //      and the user ends up with duplicate INSERTs on top of the pre-fill rows.
   const visibleSlots = useMemo(() => {
     const serverIds = new Set(data.sets.map((s) => s.id));
-    return slots.filter((slot) => !slot.materializedId || !serverIds.has(slot.materializedId));
+    return slots.filter((slot) => {
+      if (slot.materializedId) return !serverIds.has(slot.materializedId);
+      // Unmaterialized slot: suppress pre-mount phantom slots once server sets exist.
+      if (!slot.isUserAdded && data.sets.length > 0) return false;
+      return true;
+    });
   }, [slots, data.sets]);
 
   const totalRows = data.sets.length + visibleSlots.length;
@@ -157,7 +180,7 @@ export function ExerciseCard({
   function addSet() {
     slotKeyRef.current += 1;
     const key = `s-${data.id}-added-${slotKeyRef.current}`;
-    setSlots((s) => [...s, { slotKey: key, materializedId: null }]);
+    setSlots((s) => [...s, { slotKey: key, materializedId: null, isUserAdded: true }]);
   }
 
   return (
@@ -245,6 +268,7 @@ export function ExerciseCard({
             workoutExerciseId={data.id}
             displayIndex={displayIdx + 1}
             initial={s}
+            initialSetId={s.id}
             unitPreference={unitPreference}
             flushRegistry={flushRegistry}
             onSetComplete={onSetComplete}

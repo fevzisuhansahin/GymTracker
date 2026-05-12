@@ -36,6 +36,14 @@ interface Props {
   workoutExerciseId: string;
   displayIndex: number;
   initial: SetRowInitial | null; // null = placeholder, henüz DB'de yok
+  /**
+   * Explicit set UUID for rows that come from the server (data.sets).
+   * Passed in addition to `initial` so that even if React's concurrent
+   * rendering causes a brief window where `initial` is stale, the setId
+   * is always known from the first render — ensuring flush() goes through
+   * the UPDATE branch rather than INSERTing a duplicate row.
+   */
+  initialSetId?: string | null;
   unitPreference: WeightUnit;
   flushRegistry: FlushRegistry;
   onMaterialized: (setId: string) => void; // ilk save sonrası
@@ -59,6 +67,7 @@ export function SetRow({
   workoutExerciseId,
   displayIndex,
   initial,
+  initialSetId,
   unitPreference,
   flushRegistry,
   onMaterialized,
@@ -69,7 +78,9 @@ export function SetRow({
   const tRoot = useTranslations();
   const flushId = useId();
 
-  const [setId, setSetId] = useState<string | null>(initial?.id ?? null);
+  // Prefer the explicit initialSetId (passed for server-side rows to guard
+  // against concurrent-transition races), then fall back to initial?.id.
+  const [setId, setSetId] = useState<string | null>(initialSetId ?? initial?.id ?? null);
   const [weight, setWeight] = useState<string>(
     initial ? formatWeight(initial.weight, unitPreference) : "",
   );
