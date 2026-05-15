@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Bike, Calendar, Clock, Loader2, Trash2, Trophy, Weight } from "lucide-react";
+import { Bike, Calendar, Clock, Info, Loader2, Trash2, Trophy, Weight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { toast } from "sonner";
 
@@ -189,6 +189,10 @@ export function WorkoutDetail({ data, unitPreference }: Props) {
       {data.prs.length > 0 && (
         <section>
           <SectionTitle icon={<Trophy className="h-4 w-4 text-amber-500" />} title={t("prBadge")} />
+          <p className="mt-1 flex items-start gap-1 text-xs text-muted-foreground">
+            <Info className="mt-px h-3 w-3 shrink-0" aria-hidden />
+            {t("epleyFormula")}
+          </p>
           <ul className="mt-2 flex flex-col gap-2">
             {data.prs.map((pr) => (
               <li
