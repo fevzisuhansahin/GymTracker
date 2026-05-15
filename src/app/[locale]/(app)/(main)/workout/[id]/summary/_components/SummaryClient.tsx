@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Check, Loader2, Trophy } from "lucide-react";
+import { Check, Info, Loader2, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -98,9 +98,13 @@ export function SummaryClient({
       </section>
 
       <section>
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           {t("newPRsTitle")}
         </h2>
+        <p className="mb-2 flex items-start gap-1 text-xs text-muted-foreground">
+          <Info className="mt-px h-3 w-3 shrink-0" aria-hidden />
+          {t("rmFormulaHint")}
+        </p>
         {prs.length === 0 ? (
           <p className="rounded-lg border border-dashed bg-muted/30 p-4 text-sm text-muted-foreground">
             {t("noNewPRs")}

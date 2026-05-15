@@ -334,6 +334,7 @@
       "newPRsTitle": "New PRs",
       "noNewPRs": "No new PRs from this workout.",
       "newPr": "New PR: {value} (est. 1RM)",
+      "rmFormulaHint": "Estimated 1RM is calculated using the Epley formula: weight × (1 + reps/30)",
       "notesLabel": "Workout notes",
       "notesPlaceholder": "General note (how you felt, what was tough, etc.)",
       "notesSaved": "Saved",
@@ -478,6 +479,7 @@
   },
   "charts": {
     "estimated1RM": "Est. 1RM",
+    "epleyFormula": "Estimated 1RM is calculated using the Epley formula: weight × (1 + reps/30)",
     "maxWeight": "Max Weight",
     "totalVolume": "Total Volume",
     "bestSetVolume": "Best Set",

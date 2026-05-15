@@ -333,7 +333,8 @@
       "duration": "Süre",
       "newPRsTitle": "Yeni PR'lar",
       "noNewPRs": "Bu antrenmanda yeni PR yok.",
-      "newPr": "Yeni PR: {value} (tahmini 1TM)",
+      "newPr": "Yeni PR: {value} (tahmini 1RM)",
+      "rmFormulaHint": "Tahmini 1RM, Epley formülüyle hesaplanır: ağırlık × (1 + tekrar/30)",
       "notesLabel": "Antrenman notu",
       "notesPlaceholder": "Genel not (nasıl hissettin, hangi hareket zorladı vb.)",
       "notesSaved": "Kaydedildi",
@@ -477,7 +478,8 @@
     }
   },
   "charts": {
-    "estimated1RM": "Tahmini 1TM",
+    "estimated1RM": "Tahmini 1RM",
+    "epleyFormula": "Tahmini 1RM, Epley formülüyle hesaplanır: ağırlık × (1 + tekrar/30)",
     "maxWeight": "Maks Ağırlık",
     "totalVolume": "Toplam Hacim",
     "bestSetVolume": "En İyi Set",
@@ -523,7 +525,7 @@
       "volume": "{value} kg toplam",
       "streak": "{count} günlük seri"
     },
-    "bigThreeTitle": "Güç Üçlüsü (Tahmini 1TM)",
+    "bigThreeTitle": "Güç Üçlüsü (Tahmini 1RM)",
     "bigThreeEmpty": "Henüz Squat, Bench Press veya Deadlift PR'ı yok.",
     "recentTitle": "Son Antrenmanlar",
     "recentEmpty": "Henüz tamamlanmış antrenman yok.",

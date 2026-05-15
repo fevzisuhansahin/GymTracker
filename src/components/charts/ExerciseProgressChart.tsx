@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { Info } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -124,11 +125,19 @@ export function ExerciseProgressChart({ data, unit }: Props) {
     all: t("timeRangeAll"),
   };
 
+  const epleyHint = metric === "estimated1RM" ? (
+    <p className="flex items-start gap-1 text-xs text-muted-foreground">
+      <Info className="mt-px h-3 w-3 shrink-0" aria-hidden />
+      {t("epleyFormula")}
+    </p>
+  ) : null;
+
   if (filtered.length < 2) {
     return (
       <div className="flex flex-col gap-3">
         {/* Metric + time selectors still visible so UX isn't confusing */}
         <MetricSelector metrics={METRICS} active={metric} onChange={setMetric} t={t} />
+        {epleyHint}
         <TimeRangeSelector
           ranges={TIME_RANGES}
           active={timeRange}
@@ -145,6 +154,7 @@ export function ExerciseProgressChart({ data, unit }: Props) {
   return (
     <div className="flex flex-col gap-3">
       <MetricSelector metrics={METRICS} active={metric} onChange={setMetric} t={t} />
+      {epleyHint}
       <TimeRangeSelector
         ranges={TIME_RANGES}
         active={timeRange}
